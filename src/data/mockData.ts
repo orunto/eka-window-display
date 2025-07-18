@@ -7,7 +7,8 @@ export const mockProducts = [
     image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800&h=1000&fit=crop",
     price: 2850,
     description: "Hand-crafted silk evening gown with intricate beadwork. Each piece is uniquely tailored for the discerning client.",
-    category: "Evening Wear",
+    category: "Dresses",
+    collection: "Ethereal Gardens",
     tier: "A" as const
   },
   {
@@ -16,7 +17,8 @@ export const mockProducts = [
     image: "https://images.unsplash.com/photo-1594633313593-bab3825d0caf?w=800&h=1000&fit=crop",
     price: 1650,
     description: "Structured blazer in luxurious wool blend with gold threading details. Perfect for power meetings and elegant occasions.",
-    category: "Outerwear",
+    category: "Tops",
+    collection: "Golden Hour",
     tier: "A" as const
   },
   {
@@ -24,7 +26,8 @@ export const mockProducts = [
     name: "Midnight Cashmere Coat",
     image: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=1000&fit=crop", 
     description: "Ultra-soft cashmere coat with minimalist design. Available in multiple colors and custom sizing.",
-    category: "Outerwear",
+    category: "Bottoms",
+    collection: "Midnight Luxe",
     tier: "B" as const
   },
   {
@@ -32,7 +35,8 @@ export const mockProducts = [
     name: "Celestial Diamond Necklace",
     image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&h=1000&fit=crop",
     description: "Exclusive jewelry piece featuring rare diamonds in a constellation pattern.",
-    category: "Jewelry",
+    category: "Accessories",
+    collection: "Royal Heritage",
     tier: "C" as const
   },
   {
@@ -41,7 +45,8 @@ export const mockProducts = [
     image: "https://images.unsplash.com/photo-1566479179817-40b6ac0ac3c9?w=800&h=1000&fit=crop",
     price: 3200,
     description: "Timeless dress featuring hand-sewn pearl details and flowing silk fabric. A masterpiece of craftsmanship.",
-    category: "Dresses",
+    category: "Ensembles",
+    collection: "Ethereal Gardens",
     tier: "A" as const
   },
   {
@@ -49,7 +54,8 @@ export const mockProducts = [
     name: "Sage Linen Set",
     image: "https://images.unsplash.com/photo-1583846835379-c4a0b5d82b25?w=800&h=1000&fit=crop",
     description: "Comfortable yet elegant linen co-ord set perfect for sophisticated casual wear.",
-    category: "Casual",
+    category: "Ensembles",
+    collection: "Serene Minimalism",
     tier: "B" as const
   },
   {
@@ -57,7 +63,8 @@ export const mockProducts = [
     name: "Royal Velvet Cape",
     image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800&h=1000&fit=crop",
     description: "Dramatic velvet cape with historical inspiration. Limited edition piece.",
-    category: "Statement",
+    category: "Bottoms",
+    collection: "Royal Heritage",
     tier: "C" as const
   },
   {
@@ -67,6 +74,7 @@ export const mockProducts = [
     price: 1850,
     description: "Shimmering top with hand-placed crystal beading. Perfect for special occasions.",
     category: "Tops",
+    collection: "Golden Hour",
     tier: "A" as const
   }
 ];

@@ -21,18 +21,18 @@ export const EkaHeader = () => {
                   className="w-6 h-6 object-contain"
                 />
               </div>
-              <h1 className="text-2xl font-bold text-nurturing-jade tracking-wider">EKA</h1>
+              <a href="/" className="text-2xl font-bold text-nurturing-jade tracking-wider hover:opacity-80 transition-opacity">EKA</a>
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#collections" className="text-foreground hover:text-nurturing-jade transition-colors font-medium">
+              <a href="/collections" className="text-foreground hover:text-nurturing-jade transition-colors font-medium">
                 Collections
               </a>
-              <a href="#products" className="text-foreground hover:text-nurturing-jade transition-colors font-medium">
+              <a href="/products" className="text-foreground hover:text-nurturing-jade transition-colors font-medium">
                 Products
               </a>
-              <a href="#about" className="text-foreground hover:text-nurturing-jade transition-colors font-medium">
+              <a href="/about" className="text-foreground hover:text-nurturing-jade transition-colors font-medium">
                 About
               </a>
             </nav>
@@ -70,13 +70,13 @@ export const EkaHeader = () => {
           {isMobileMenuOpen && (
             <div className="md:hidden mt-4 pt-4 border-t border-serene-sage/30">
               <nav className="flex flex-col space-y-3">
-                <a href="#collections" className="text-foreground hover:text-nurturing-jade transition-colors font-medium py-2">
+                <a href="/collections" className="text-foreground hover:text-nurturing-jade transition-colors font-medium py-2">
                   Collections
                 </a>
-                <a href="#products" className="text-foreground hover:text-nurturing-jade transition-colors font-medium py-2">
+                <a href="/products" className="text-foreground hover:text-nurturing-jade transition-colors font-medium py-2">
                   Products
                 </a>
-                <a href="#about" className="text-foreground hover:text-nurturing-jade transition-colors font-medium py-2">
+                <a href="/about" className="text-foreground hover:text-nurturing-jade transition-colors font-medium py-2">
                   About
                 </a>
                 <div className="pt-2">

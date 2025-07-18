@@ -13,6 +13,7 @@ interface Product {
   price?: number;
   description: string;
   category: string;
+  collection?: string;
   tier: AccessTier;
 }
 
@@ -105,14 +106,19 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
         </div>
 
         {/* Product Info */}
-        <div className="p-4 space-y-3">
+        <div className="p-4 space-y-2">
           <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">
-              {product.category}
-            </p>
             <h3 className="font-semibold text-foreground group-hover:text-nurturing-jade transition-colors">
               {product.name}
             </h3>
+            {product.collection && (
+              <p className="text-xs text-nurturing-jade font-medium">
+                {product.collection}
+              </p>
+            )}
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">
+              {product.category}
+            </p>
           </div>
 
           {/* Price - only show for tier A */}
