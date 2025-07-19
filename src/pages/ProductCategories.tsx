@@ -1,17 +1,48 @@
 import { EkaHeader } from "@/components/EkaHeader";
-import { ProductCard } from "@/components/ProductCard";
-import { mockProducts } from "@/data/mockData";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const ProductCategories = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Load fonts
+    const loadFonts = () => {
+      const link1 = document.createElement('link');
+      link1.href = 'https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap';
+      link1.rel = 'stylesheet';
+      document.head.appendChild(link1);
+
+      const link2 = document.createElement('link');
+      link2.href = 'https://fonts.googleapis.com/css2?family=Arapey:ital@0;1&display=swap';
+      link2.rel = 'stylesheet';
+      document.head.appendChild(link2);
+    };
+    loadFonts();
+  }, []);
   
-  const categories = ["All", "Tops", "Bottoms", "Ensembles", "Accessories"];
-  
-  const filteredProducts = selectedCategory === "All" 
-    ? mockProducts 
-    : mockProducts.filter(product => product.category === selectedCategory);
+  const categories = [
+    {
+      name: "Tops",
+      description: "Sophisticated blouses, blazers, and statement pieces designed for the modern professional.",
+      image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500&h=600&fit=crop"
+    },
+    {
+      name: "Bottoms", 
+      description: "Tailored trousers, elegant skirts, and contemporary silhouettes for every occasion.",
+      image: "https://images.unsplash.com/photo-1551803091-e20673f15770?w=500&h=600&fit=crop"
+    },
+    {
+      name: "Ensembles",
+      description: "Complete coordinated sets and statement dresses that embody Afromodern elegance.",
+      image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=500&h=600&fit=crop"
+    },
+    {
+      name: "Accessories",
+      description: "Luxury jewelry, handbags, and finishing touches that complete your distinctive look.",
+      image: "https://images.unsplash.com/photo-1506629905607-45848be1e3b7?w=500&h=600&fit=crop"
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -19,7 +50,7 @@ const ProductCategories = () => {
       
       <div className="container mx-auto px-4 py-20">
         <div className="text-center mb-16 space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-obsidian-depth">
+          <h1 className="text-4xl md:text-5xl font-heading font-normal text-obsidian-depth">
             Product Categories
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -28,64 +59,35 @@ const ProductCategories = () => {
           </p>
         </div>
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
+        {/* Category Cards */}
+        <div className="grid md:grid-cols-2 gap-8">
           {categories.map((category) => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? "exclusive" : "outline"}
-              onClick={() => setSelectedCategory(category)}
-              className="rounded-full px-6"
+            <div 
+              key={category.name}
+              onClick={() => navigate(`/category/${category.name.toLowerCase()}`)}
+              className="group relative overflow-hidden rounded-lg bg-card shadow-card hover:shadow-luxury transition-all duration-300 cursor-pointer"
             >
-              {category}
-            </Button>
+              <div className="aspect-[4/3] overflow-hidden">
+                <img 
+                  src={category.image} 
+                  alt={category.name}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+              
+              <div className="absolute inset-0 bg-gradient-to-t from-obsidian-depth/80 via-obsidian-depth/20 to-transparent" />
+              
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <h3 className="text-2xl font-heading font-normal mb-2 group-hover:text-golden-grace transition-colors">
+                  {category.name}
+                </h3>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  {category.description}
+                </p>
+              </div>
+            </div>
           ))}
         </div>
-
-        {/* Category Descriptions */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-pearl-mist p-6 rounded-lg text-center">
-            <h3 className="text-lg font-semibold text-obsidian-depth mb-3">Tops</h3>
-            <p className="text-sm text-muted-foreground">
-              Sophisticated blouses, blazers, and statement pieces designed for the modern professional.
-            </p>
-          </div>
-          <div className="bg-pearl-mist p-6 rounded-lg text-center">
-            <h3 className="text-lg font-semibold text-obsidian-depth mb-3">Bottoms</h3>
-            <p className="text-sm text-muted-foreground">
-              Tailored trousers, elegant skirts, and contemporary silhouettes for every occasion.
-            </p>
-          </div>
-          <div className="bg-pearl-mist p-6 rounded-lg text-center">
-            <h3 className="text-lg font-semibold text-obsidian-depth mb-3">Ensembles</h3>
-            <p className="text-sm text-muted-foreground">
-              Complete coordinated sets and statement dresses that embody Afromodern elegance.
-            </p>
-          </div>
-          <div className="bg-pearl-mist p-6 rounded-lg text-center">
-            <h3 className="text-lg font-semibold text-obsidian-depth mb-3">Accessories</h3>
-            <p className="text-sm text-muted-foreground">
-              Luxury jewelry, handbags, and finishing touches that complete your distinctive look.
-            </p>
-          </div>
-        </div>
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <ProductCard 
-              key={product.id} 
-              product={product}
-              onClick={() => console.log(`Viewing product: ${product.name}`)}
-            />
-          ))}
-        </div>
-
-        {filteredProducts.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No products found in this category.</p>
-          </div>
-        )}
       </div>
 
       {/* Footer */}

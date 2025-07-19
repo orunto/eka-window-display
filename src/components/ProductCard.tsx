@@ -1,8 +1,5 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Eye, Lock, ShoppingBag } from "lucide-react";
-import { LoginModal } from "./LoginModal";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 type AccessTier = "A" | "B" | "C";
 
@@ -23,162 +20,78 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product, onClick }: ProductCardProps) => {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Load fonts
+    const loadFonts = () => {
+      const link1 = document.createElement('link');
+      link1.href = 'https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap';
+      link1.rel = 'stylesheet';
+      document.head.appendChild(link1);
+
+      const link2 = document.createElement('link');
+      link2.href = 'https://fonts.googleapis.com/css2?family=Arapey:ital@0;1&display=swap';
+      link2.rel = 'stylesheet';
+      document.head.appendChild(link2);
+    };
+    loadFonts();
+  }, []);
 
   const handleClick = () => {
     if (product.tier === "C") {
-      setIsLoginOpen(true);
-      return;
+      return; // Don't navigate for restricted products
     }
-    onClick?.();
+    navigate(`/product/${product.id}`);
   };
 
-  const handleBuyClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsLoginOpen(true);
-  };
-
-  const getTierBadge = () => {
-    switch (product.tier) {
-      case "A":
-        return <Badge variant="secondary" className="bg-golden-grace text-white">Full Access</Badge>;
-      case "B":
-        return <Badge variant="outline" className="border-serene-sage">Limited View</Badge>;
-      case "C":
-        return <Badge variant="destructive" className="bg-obsidian-depth">Restricted</Badge>;
-      default:
-        return null;
-    }
-  };
-
-  const isRestricted = product.tier === "C";
-
-  return (
-    <>
-      <div 
-        className={`group relative bg-card rounded-lg overflow-hidden shadow-card hover:shadow-luxury transition-all duration-300 cursor-pointer ${
-          isRestricted ? "opacity-75" : ""
-        }`}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onClick={handleClick}
-      >
-        {/* Product Image */}
+  if (product.tier === "C") {
+    return (
+      <div className="group relative bg-card rounded-lg overflow-hidden shadow-card cursor-not-allowed">
         <div className="relative aspect-[4/5] overflow-hidden bg-pearl-mist">
           <img 
             src={product.image} 
             alt={product.name}
-            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
-              isRestricted ? "blur-sm" : ""
-            }`}
+            className="w-full h-full object-cover blur-sm"
           />
-          
-          {/* Overlay for restricted items */}
-          {isRestricted && (
-            <div className="absolute inset-0 bg-obsidian-depth/30 flex items-center justify-center">
-              <div className="text-center text-white space-y-2">
-                <Lock className="w-8 h-8 mx-auto" />
-                <p className="text-sm font-medium">Client Access Required</p>
-              </div>
+          <div className="absolute inset-0 bg-obsidian-depth/50 flex items-center justify-center">
+            <div className="text-center text-white space-y-2">
+              <p className="text-sm font-medium">Client Access Required</p>
             </div>
-          )}
-
-          {/* Tier Badge */}
-          <div className="absolute top-3 left-3">
-            {getTierBadge()}
-          </div>
-
-          {/* Quick Actions */}
-          {!isRestricted && (
-            <div className={`absolute top-3 right-3 flex flex-col space-y-2 transition-opacity duration-300 ${
-              isHovered ? "opacity-100" : "opacity-0"
-            }`}>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                className="bg-white/90 hover:bg-white text-obsidian-depth"
-              >
-                <Eye className="w-4 h-4" />
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Product Info */}
-        <div className="p-4 space-y-2">
-          <div>
-            <h3 className="font-semibold text-foreground group-hover:text-nurturing-jade transition-colors">
-              {product.name}
-            </h3>
-            {product.collection && (
-              <p className="text-xs text-nurturing-jade font-medium">
-                {product.collection}
-              </p>
-            )}
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">
-              {product.category}
-            </p>
-          </div>
-
-          {/* Price - only show for tier A */}
-          {product.tier === "A" && product.price && (
-            <div className="flex items-center justify-between">
-              <p className="text-lg font-bold text-nurturing-jade">
-                ${product.price.toLocaleString()}
-              </p>
-            </div>
-          )}
-
-          {/* No price for tier B */}
-          {product.tier === "B" && (
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground italic">
-                Price available to clients
-              </p>
-            </div>
-          )}
-
-          {/* Description - truncated for restricted items */}
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {isRestricted ? "Exclusive piece available to Eka clients only." : product.description}
-          </p>
-
-          {/* Action Button */}
-          <div className="pt-2">
-            {product.tier === "A" ? (
-              <Button 
-                variant="exclusive" 
-                className="w-full"
-                onClick={handleBuyClick}
-              >
-                <ShoppingBag className="w-4 h-4 mr-2" />
-                Purchase - Client Login Required
-              </Button>
-            ) : product.tier === "B" ? (
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={handleBuyClick}
-              >
-                <Lock className="w-4 h-4 mr-2" />
-                View Price - Client Access
-              </Button>
-            ) : (
-              <Button 
-                variant="restricted" 
-                className="w-full"
-                disabled
-              >
-                <Lock className="w-4 h-4 mr-2" />
-                Restricted Access
-              </Button>
-            )}
           </div>
         </div>
       </div>
+    );
+  }
 
-      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
-    </>
+  return (
+    <div 
+      className="group relative bg-card rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+      onClick={handleClick}
+    >
+      {/* Product Image - Apple style minimal */}
+      <div className="relative aspect-[4/5] overflow-hidden bg-background">
+        <img 
+          src={product.image} 
+          alt={product.name}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+        />
+      </div>
+
+      {/* Product Info - Minimal Apple style */}
+      <div className="p-4 space-y-1">
+        <h3 className="font-heading font-normal text-lg text-foreground">
+          {product.name}
+        </h3>
+        {product.collection && (
+          <p className="text-sm text-nurturing-jade font-medium">
+            {product.collection}
+          </p>
+        )}
+        <p className="text-sm text-muted-foreground">
+          {product.category}
+        </p>
+      </div>
+    </div>
   );
 };

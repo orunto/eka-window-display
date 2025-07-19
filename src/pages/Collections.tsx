@@ -2,15 +2,35 @@ import { EkaHeader } from "@/components/EkaHeader";
 import { mockCollections } from "@/data/mockData";
 import { Badge } from "@/components/ui/badge";
 import { Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const Collections = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Load fonts
+    const loadFonts = () => {
+      const link1 = document.createElement('link');
+      link1.href = 'https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap';
+      link1.rel = 'stylesheet';
+      document.head.appendChild(link1);
+
+      const link2 = document.createElement('link');
+      link2.href = 'https://fonts.googleapis.com/css2?family=Arapey:ital@0;1&display=swap';
+      link2.rel = 'stylesheet';
+      document.head.appendChild(link2);
+    };
+    loadFonts();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <EkaHeader />
       
       <div className="container mx-auto px-4 py-20">
         <div className="text-center mb-16 space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-obsidian-depth">
+          <h1 className="text-4xl md:text-5xl font-heading font-normal text-obsidian-depth">
             Collections
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -21,11 +41,15 @@ const Collections = () => {
 
         <div className="space-y-20">
           {mockCollections.map((collection, index) => (
-            <section key={collection.id} className={`${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
+            <section 
+              key={collection.id} 
+              className={`group cursor-pointer ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}
+              onClick={() => navigate(`/collection/${collection.id}`)}
+            >
               <div className="grid lg:grid-cols-2 gap-12 items-center">
-                <div className="space-y-6">
+                  <div className="space-y-6">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-3xl md:text-4xl font-bold text-obsidian-depth">
+                    <h2 className="text-3xl md:text-4xl font-heading font-normal text-obsidian-depth group-hover:text-nurturing-jade transition-colors">
                       {collection.name}
                     </h2>
                     {collection.tier === "A" && (
