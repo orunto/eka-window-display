@@ -82,55 +82,62 @@ export const mockProducts = [
 export const mockCollections = [
   {
     id: "1",
-    name: "Ethereal Gardens",
-    description: "A collection inspired by the mystical beauty of enchanted gardens, featuring flowing silhouettes and nature-inspired details.",
+    name: "Amara Essential",
+    description: "A curated capsule wardrobe of 12 timeless pieces that form the foundation of effortless elegance. Each piece seamlessly transitions from boardroom to evening soirée, embodying Eka's philosophy of luxury through simplicity.",
     image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=800&fit=crop",
     productCount: 12,
     tier: "A" as const,
-    season: "Spring 2024"
+    season: "Capsule Collection 2024",
+    story: "Born from our founder's vision of 'mother is supreme,' Amara Essential celebrates the modern woman who values quality over quantity. Twelve carefully chosen pieces that honor heritage while embracing contemporary sophistication."
   },
   {
-    id: "2",
-    name: "Urban Sophistication",
-    description: "Modern pieces for the contemporary woman who demands both style and substance in her wardrobe.",
+    id: "2", 
+    name: "Eka x Adunni Atelier",
+    description: "An exclusive collaboration merging Eka's refined tailoring with Adunni Atelier's exquisite leather craftsmanship. Limited edition pieces where African luxury meets contemporary accessories design.",
     image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=800&fit=crop",
     productCount: 8,
     tier: "B" as const,
-    season: "Fall 2024"
+    season: "Collaboration 2024",
+    story: "Two heritage brands unite to create something extraordinary. Each piece tells a story of cross-cultural artistry, blending our mothers' legacies into contemporary luxury."
   },
   {
     id: "3",
-    name: "Midnight Luxe",
-    description: "Our most exclusive collection featuring rare materials and avant-garde designs for the true connoisseur.",
+    name: "Nneka's Legacy",
+    description: "Our most exclusive collection, featuring archival designs reimagined for the modern era. Limited to founding clients and select members, each piece carries the original vision forward.",
     image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1200&h=800&fit=crop",
     productCount: 6,
     tier: "C" as const,
-    season: "Limited Edition"
+    season: "Heritage Edition",
+    story: "Named after our founder's inspiration, this collection preserves the essence of Eka's origins while pushing boundaries of contemporary African luxury."
   },
   {
     id: "4",
-    name: "Golden Hour",
-    description: "Warm, luxurious pieces that capture the magic of sunset, featuring golden accents and rich textures.",
+    name: "Sahel Sophistication", 
+    description: "Inspired by the golden hour across the Sahel, this collection captures the warmth and richness of African landscapes in flowing silhouettes and earth-toned luxury.",
     image: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&h=800&fit=crop",
     productCount: 10,
     tier: "A" as const,
-    season: "Summer 2024"
+    season: "Resort 2024",
+    story: "From the vast beauty of our continent's heart comes a collection that speaks to the global African diaspora, celebrating our shared heritage through contemporary design."
   },
   {
     id: "5",
-    name: "Serene Minimalism",
-    description: "Clean lines and understated elegance define this collection of essential pieces for the modern wardrobe.",
+    name: "Lagos Luxe",
+    description: "Urban elegance meets African heritage in this collection designed for the cosmopolitan woman. Clean lines with cultural undertones define this essential wardrobe for global cities.",
     image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=1200&h=800&fit=crop",
-    productCount: 7,
-    tier: "B" as const
+    productCount: 14,
+    tier: "A" as const,
+    season: "Urban 2024",
+    story: "For the woman who moves between worlds with grace, carrying her heritage as strength while embracing global sophistication."
   },
   {
     id: "6",
-    name: "Royal Heritage",
-    description: "Timeless pieces inspired by royal fashion throughout history, featuring exquisite craftsmanship and premium materials.",
+    name: "Ancestral Threads",
+    description: "Royal-inspired pieces that honor ancestral craftsmanship while pushing the boundaries of contemporary luxury. Each garment is a testament to timeless African artistry.",
     image: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=1200&h=800&fit=crop",
-    productCount: 4,
+    productCount: 7,
     tier: "C" as const,
-    season: "Exclusive"
+    season: "Artisan Series",
+    story: "Where ancient techniques meet modern vision, creating pieces that bridge generations and celebrate the continuity of African excellence."
   }
 ];
