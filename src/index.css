@@ -8,58 +8,58 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Eka Brand Colors - Inspired by brand guidelines */
-    --eka-deep-jade: 160 70% 20%;        /* Deep luxury green from brand docs */
-    --eka-rich-emerald: 160 60% 25%;     /* Secondary green tone */
-    --eka-golden-luxury: 38 85% 65%;     /* Rich golden from brand pattern */
-    --eka-warm-gold: 35 90% 70%;         /* Warmer gold variant */
-    --eka-cream-elegance: 40 25% 94%;    /* Sophisticated cream background */
-    --eka-sage-whisper: 150 15% 88%;     /* Subtle sage for accents */
-    --eka-obsidian: 0 0% 8%;             /* Deep sophisticated black */
-    --eka-charcoal: 0 0% 15%;            /* Charcoal for text */
+    /* Eka Refined Color Palette - Apple-inspired luxury */
+    --eka-deep-forest: 160 25% 18%;      /* Deep sophisticated green */
+    --eka-jade-luxury: 160 18% 25%;      /* Refined jade tone */
+    --eka-champagne: 45 25% 85%;         /* Subtle champagne gold */
+    --eka-warm-bronze: 30 15% 45%;       /* Sophisticated bronze */
+    --eka-pearl: 45 20% 96%;             /* Pure pearl white */
+    --eka-cloud: 210 15% 92%;            /* Soft cloud gray */
+    --eka-graphite: 210 8% 15%;          /* Elegant graphite */
+    --eka-ink: 210 12% 8%;               /* Deep ink black */
 
-    /* Design System Colors - Luxury Brand Mapping */
-    --background: var(--eka-cream-elegance);
-    --foreground: var(--eka-charcoal);
+    /* Apple-inspired Design System */
+    --background: var(--eka-pearl);
+    --foreground: var(--eka-graphite);
 
     --card: 0 0% 100%;
-    --card-foreground: var(--eka-charcoal);
+    --card-foreground: var(--eka-graphite);
 
     --popover: 0 0% 100%;
-    --popover-foreground: var(--eka-charcoal);
+    --popover-foreground: var(--eka-graphite);
 
-    --primary: var(--eka-deep-jade);
+    --primary: var(--eka-deep-forest);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: var(--eka-sage-whisper);
-    --secondary-foreground: var(--eka-charcoal);
+    --secondary: var(--eka-cloud);
+    --secondary-foreground: var(--eka-graphite);
 
-    --muted: var(--eka-sage-whisper);
-    --muted-foreground: 0 0% 45%;
+    --muted: var(--eka-cloud);
+    --muted-foreground: var(--eka-warm-bronze);
 
-    --accent: var(--eka-golden-luxury);
-    --accent-foreground: var(--eka-obsidian);
+    --accent: var(--eka-champagne);
+    --accent-foreground: var(--eka-graphite);
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: var(--eka-sage-whisper);
-    --input: var(--eka-sage-whisper);
-    --ring: var(--eka-deep-jade);
+    --border: var(--eka-cloud);
+    --input: var(--eka-cloud);
+    --ring: var(--eka-jade-luxury);
 
-    /* Luxury Brand Gradients */
-    --gradient-luxury: linear-gradient(135deg, hsl(var(--eka-deep-jade)), hsl(var(--eka-golden-luxury)));
-    --gradient-golden: linear-gradient(135deg, hsl(var(--eka-golden-luxury)), hsl(var(--eka-warm-gold)));
-    --gradient-jade: linear-gradient(135deg, hsl(var(--eka-deep-jade)), hsl(var(--eka-rich-emerald)));
-    --gradient-subtle: linear-gradient(180deg, hsl(var(--eka-cream-elegance)), hsl(var(--eka-sage-whisper)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--eka-deep-jade) / 0.95), hsl(var(--eka-golden-luxury) / 0.85));
+    /* Apple-inspired Premium Gradients */
+    --gradient-primary: linear-gradient(180deg, hsl(var(--eka-deep-forest)), hsl(var(--eka-jade-luxury)));
+    --gradient-accent: linear-gradient(180deg, hsl(var(--eka-champagne)), hsl(var(--eka-cloud)));
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--eka-pearl)), hsl(var(--eka-cloud) / 0.5));
+    --gradient-luxury: linear-gradient(135deg, hsl(var(--eka-deep-forest) / 0.9), hsl(var(--eka-jade-luxury) / 0.8));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100% / 0.8), hsl(var(--eka-cloud) / 0.4));
 
-    /* Sophisticated Shadows */
-    --shadow-luxury: 0 25px 50px -15px hsl(var(--eka-deep-jade) / 0.3);
-    --shadow-golden: 0 15px 35px -10px hsl(var(--eka-golden-luxury) / 0.25);
-    --shadow-card: 0 10px 40px -10px hsl(var(--eka-deep-jade) / 0.15);
-    --shadow-glow: 0 0 40px hsl(var(--eka-golden-luxury) / 0.4);
-    --shadow-elegant: 0 8px 32px -8px hsl(var(--eka-obsidian) / 0.1);
+    /* Refined Shadows - Apple style */
+    --shadow-sm: 0 1px 3px 0 hsl(var(--eka-ink) / 0.1);
+    --shadow-md: 0 4px 12px -2px hsl(var(--eka-ink) / 0.08);
+    --shadow-lg: 0 10px 25px -5px hsl(var(--eka-ink) / 0.1);
+    --shadow-xl: 0 20px 40px -10px hsl(var(--eka-ink) / 0.12);
+    --shadow-card: 0 1px 3px 0 hsl(var(--eka-ink) / 0.05), 0 10px 15px -5px hsl(var(--eka-ink) / 0.08);
 
     --radius: 0.5rem;
 

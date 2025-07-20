@@ -19,15 +19,15 @@ export default {
 		},
 		extend: {
 			colors: {
-				// Eka luxury brand colors
-				'eka-deep-jade': 'hsl(var(--eka-deep-jade))',
-				'eka-rich-emerald': 'hsl(var(--eka-rich-emerald))',
-				'eka-golden-luxury': 'hsl(var(--eka-golden-luxury))',
-				'eka-warm-gold': 'hsl(var(--eka-warm-gold))',
-				'eka-cream-elegance': 'hsl(var(--eka-cream-elegance))',
-				'eka-sage-whisper': 'hsl(var(--eka-sage-whisper))',
-				'eka-obsidian': 'hsl(var(--eka-obsidian))',
-				'eka-charcoal': 'hsl(var(--eka-charcoal))',
+				// Eka refined brand colors
+				'eka-deep-forest': 'hsl(var(--eka-deep-forest))',
+				'eka-jade-luxury': 'hsl(var(--eka-jade-luxury))',
+				'eka-champagne': 'hsl(var(--eka-champagne))',
+				'eka-warm-bronze': 'hsl(var(--eka-warm-bronze))',
+				'eka-pearl': 'hsl(var(--eka-pearl))',
+				'eka-cloud': 'hsl(var(--eka-cloud))',
+				'eka-graphite': 'hsl(var(--eka-graphite))',
+				'eka-ink': 'hsl(var(--eka-ink))',
 				
 				// Design system
 				border: 'hsl(var(--border))',
@@ -84,20 +84,20 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			backgroundImage: {
-				'gradient-luxury': 'var(--gradient-luxury)',
-				'gradient-golden': 'var(--gradient-golden)',
-				'gradient-jade': 'var(--gradient-jade)',
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-accent': 'var(--gradient-accent)',
 				'gradient-subtle': 'var(--gradient-subtle)',
-				'gradient-hero': 'var(--gradient-hero)',
+				'gradient-luxury': 'var(--gradient-luxury)',
+				'gradient-card': 'var(--gradient-card)',
 				'pattern-floral': `url('/lovable-uploads/0555df50-cd91-4e2c-95d7-7009f8e63ef9.png')`,
 				'pattern-elegant': `url('/lovable-uploads/faba6ba3-5bb9-4134-9891-08c5c6bad58a.png')`,
 			},
 			boxShadow: {
-				'luxury': 'var(--shadow-luxury)',
-				'golden': 'var(--shadow-golden)',
-				'card': 'var(--shadow-card)',
-				'glow': 'var(--shadow-glow)',
-				'elegant': 'var(--shadow-elegant)'
+				'sm': 'var(--shadow-sm)',
+				'md': 'var(--shadow-md)',
+				'lg': 'var(--shadow-lg)',
+				'xl': 'var(--shadow-xl)',
+				'card': 'var(--shadow-card)'
 			},
 			keyframes: {
 				'accordion-down': {
