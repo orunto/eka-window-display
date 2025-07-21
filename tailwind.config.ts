@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -22,12 +23,15 @@ export default {
 				// Eka refined brand colors
 				'eka-deep-forest': 'hsl(var(--eka-deep-forest))',
 				'eka-jade-luxury': 'hsl(var(--eka-jade-luxury))',
+				'eka-emerald-depth': 'hsl(var(--eka-emerald-depth))',
+				'eka-sage-whisper': 'hsl(var(--eka-sage-whisper))',
 				'eka-champagne': 'hsl(var(--eka-champagne))',
 				'eka-warm-bronze': 'hsl(var(--eka-warm-bronze))',
 				'eka-pearl': 'hsl(var(--eka-pearl))',
 				'eka-cloud': 'hsl(var(--eka-cloud))',
 				'eka-graphite': 'hsl(var(--eka-graphite))',
 				'eka-ink': 'hsl(var(--eka-ink))',
+				'eka-golden': 'hsl(var(--eka-golden))',
 				
 				// Design system
 				border: 'hsl(var(--border))',
@@ -85,64 +89,47 @@ export default {
 			},
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-secondary': 'var(--gradient-secondary)',
 				'gradient-accent': 'var(--gradient-accent)',
-				'gradient-subtle': 'var(--gradient-subtle)',
-				'gradient-luxury': 'var(--gradient-luxury)',
 				'gradient-card': 'var(--gradient-card)',
-				'pattern-floral': `url('/lovable-uploads/0555df50-cd91-4e2c-95d7-7009f8e63ef9.png')`,
-				'pattern-elegant': `url('/lovable-uploads/faba6ba3-5bb9-4134-9891-08c5c6bad58a.png')`,
+				'gradient-hero': 'var(--gradient-hero)',
+				'gradient-glass': 'var(--gradient-glass)',
 			},
 			boxShadow: {
 				'sm': 'var(--shadow-sm)',
 				'md': 'var(--shadow-md)',
 				'lg': 'var(--shadow-lg)',
 				'xl': 'var(--shadow-xl)',
-				'card': 'var(--shadow-card)'
+				'glow': 'var(--shadow-glow)'
 			},
 			keyframes: {
 				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
+					from: { height: '0' },
+					to: { height: 'var(--radix-accordion-content-height)' }
 				},
 				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
-					}
+					from: { height: 'var(--radix-accordion-content-height)' },
+					to: { height: '0' }
 				},
 				'fade-in': {
-					'0%': {
-						opacity: '0',
-						transform: 'translateY(20px)'
-					},
-					'100%': {
-						opacity: '1',
-						transform: 'translateY(0)'
-					}
+					'0%': { opacity: '0', transform: 'translateY(20px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
 				},
 				'scale-in': {
-					'0%': {
-						transform: 'scale(0.95)',
-						opacity: '0'
-					},
-					'100%': {
-						transform: 'scale(1)',
-						opacity: '1'
-					}
+					'0%': { transform: 'scale(0.95)', opacity: '0' },
+					'100%': { transform: 'scale(1)', opacity: '1' }
 				},
 				'shimmer': {
-					'0%': {
-						transform: 'translateX(-100%)'
-					},
-					'100%': {
-						transform: 'translateX(100%)'
-					}
+					'0%': { transform: 'translateX(-100%)' },
+					'100%': { transform: 'translateX(100%)' }
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0px)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				'glow': {
+					'0%, 100%': { boxShadow: '0 0 20px hsl(var(--eka-golden) / 0.3)' },
+					'50%': { boxShadow: '0 0 30px hsl(var(--eka-golden) / 0.6)' }
 				}
 			},
 			animation: {
@@ -150,7 +137,9 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.6s ease-out',
 				'scale-in': 'scale-in 0.3s ease-out',
-				'shimmer': 'shimmer 2s ease-in-out infinite'
+				'shimmer': 'shimmer 2s ease-in-out infinite',
+				'float': 'float 6s ease-in-out infinite',
+				'glow': 'glow 2s ease-in-out infinite alternate'
 			}
 		}
 	},
