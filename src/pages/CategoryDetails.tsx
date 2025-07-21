@@ -1,6 +1,8 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { EkaHeader } from "@/components/EkaHeader";
+import { EkaFooter } from "@/components/EkaFooter";
 import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -11,6 +13,9 @@ const CategoryDetails = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+    
     // Load fonts
     const loadFonts = () => {
       const link1 = document.createElement('link');
@@ -68,15 +73,19 @@ const CategoryDetails = () => {
   const categoryInfo = getCategoryDescription();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
+      {/* Subtle decorative pattern overlays */}
+      <div className="absolute top-0 right-0 w-1/4 h-1/2 pattern-subtle opacity-30" />
+      <div className="absolute bottom-0 left-0 w-1/6 h-1/3 pattern-accent opacity-20" />
+      
       <EkaHeader />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Back Button */}
         <Button 
           variant="ghost" 
           onClick={() => navigate(-1)}
-          className="mb-6"
+          className="mb-6 text-eka-pearl hover:text-eka-golden"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Categories
@@ -125,6 +134,8 @@ const CategoryDetails = () => {
           )}
         </div>
       </div>
+
+      <EkaFooter />
     </div>
   );
 };

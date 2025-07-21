@@ -161,10 +161,7 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
           </p>
         </div>
         
-        <div className="flex items-center justify-between pt-2 border-t border-eka-jade-luxury/30">
-          <p className="text-sm text-eka-champagne/80">
-            Bespoke Available
-          </p>
+        <div className="flex items-center justify-end pt-2 border-t border-eka-jade-luxury/30">
           <div className={`w-6 h-6 rounded-full bg-gradient-accent transition-all duration-300 ${isHovered ? 'scale-110 shadow-glow' : ''}`} />
         </div>
       </div>

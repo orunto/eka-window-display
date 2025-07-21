@@ -1,11 +1,17 @@
+
 import { EkaHeader } from "@/components/EkaHeader";
+import { EkaFooter } from "@/components/EkaFooter";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { ArrowRight } from "lucide-react";
 
 const ProductCategories = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+    
     // Load fonts
     const loadFonts = () => {
       const link1 = document.createElement('link');
@@ -25,96 +31,102 @@ const ProductCategories = () => {
     {
       name: "Tops",
       description: "Sophisticated blouses, blazers, and statement pieces designed for the modern professional.",
-      image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500&h=600&fit=crop"
+      image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500&h=600&fit=crop",
+      count: "12 Pieces"
     },
     {
       name: "Bottoms", 
       description: "Tailored trousers, elegant skirts, and contemporary silhouettes for every occasion.",
-      image: "https://images.unsplash.com/photo-1551803091-e20673f15770?w=500&h=600&fit=crop"
+      image: "https://images.unsplash.com/photo-1551803091-e20673f15770?w=500&h=600&fit=crop",
+      count: "8 Pieces"
     },
     {
       name: "Ensembles",
       description: "Complete coordinated sets and statement dresses that embody Afromodern elegance.",
-      image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=500&h=600&fit=crop"
+      image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=500&h=600&fit=crop",
+      count: "15 Pieces"
     },
     {
       name: "Accessories",
       description: "Luxury jewelry, handbags, and finishing touches that complete your distinctive look.",
-      image: "https://images.unsplash.com/photo-1506629905607-45848be1e3b7?w=500&h=600&fit=crop"
+      image: "https://images.unsplash.com/photo-1506629905607-45848be1e3b7?w=500&h=600&fit=crop",
+      count: "24 Pieces"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
+      {/* Subtle decorative pattern overlays */}
+      <div className="absolute top-0 right-0 w-1/4 h-1/2 pattern-subtle opacity-30" />
+      <div className="absolute bottom-0 left-0 w-1/6 h-1/3 pattern-accent opacity-20" />
+      
       <EkaHeader />
       
-      <div className="container mx-auto px-4 py-20">
-        <div className="text-center mb-16 space-y-4">
-          <h1 className="text-4xl md:text-5xl font-heading font-normal text-obsidian-depth">
-            Product Categories
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Explore our carefully curated categories of Afromodern luxury fashion. 
-            Each piece represents our commitment to exceptional craftsmanship and contemporary design.
-          </p>
+      <div className="container mx-auto px-4 py-20 relative z-10">
+        <div className="text-center mb-20">
+          <div className="relative inline-block p-12 rounded-3xl bg-gradient-glass backdrop-blur-xl shadow-xl border border-eka-jade-luxury/30">
+            <div className="absolute inset-0 bg-gradient-accent opacity-[0.05] rounded-3xl" />
+            <div className="relative z-10">
+              <h1 className="text-5xl md:text-6xl font-heading text-eka-pearl mb-6 tracking-wide">
+                Product Categories
+              </h1>
+              <p className="text-xl text-eka-champagne max-w-3xl mx-auto leading-relaxed">
+                Explore our carefully curated categories of Afromodern luxury fashion. 
+                Each piece represents our commitment to exceptional craftsmanship and contemporary design.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Category Cards */}
         <div className="grid md:grid-cols-2 gap-8">
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <div 
               key={category.name}
               onClick={() => navigate(`/category/${category.name.toLowerCase()}`)}
-              className="group relative overflow-hidden rounded-lg bg-card shadow-card hover:shadow-luxury transition-all duration-300 cursor-pointer"
+              className="group relative bg-gradient-glass backdrop-blur-md rounded-3xl overflow-hidden shadow-lg hover:shadow-glow transition-all duration-500 cursor-pointer border border-eka-jade-luxury/30 hover:border-eka-golden/50"
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className="aspect-[4/3] overflow-hidden">
+              <div className="relative aspect-[5/4] overflow-hidden">
                 <img 
                   src={category.image} 
                   alt={category.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-              </div>
-              
-              <div className="absolute inset-0 bg-gradient-to-t from-obsidian-depth/80 via-obsidian-depth/20 to-transparent" />
-              
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <h3 className="text-2xl font-heading font-normal mb-2 group-hover:text-golden-grace transition-colors">
-                  {category.name}
-                </h3>
-                <p className="text-white/80 text-sm leading-relaxed">
-                  {category.description}
-                </p>
+                
+                {/* Elegant gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-eka-emerald-depth/20 via-eka-emerald-depth/40 to-eka-emerald-depth/80" />
+                
+                {/* Content overlay */}
+                <div className="absolute inset-0 flex flex-col justify-end p-8">
+                  <div className="bg-gradient-glass backdrop-blur-md rounded-2xl p-6 border border-eka-pearl/20">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-3xl font-heading text-eka-pearl group-hover:text-eka-golden transition-colors duration-300">
+                        {category.name}
+                      </h3>
+                      <div className="flex items-center space-x-2 text-eka-champagne">
+                        <span className="text-sm font-medium">{category.count}</span>
+                        <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" />
+                      </div>
+                    </div>
+                    <p className="text-eka-pearl/90 text-sm leading-relaxed mb-4">
+                      {category.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="w-12 h-1 bg-gradient-accent rounded-full group-hover:w-20 transition-all duration-500" />
+                      <span className="text-xs text-eka-champagne/80 uppercase tracking-wider">
+                        Explore Collection
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-obsidian-depth text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="text-center space-y-6">
-            <div className="flex items-center justify-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-luxury rounded-full flex items-center justify-center">
-                <img 
-                  src="/lovable-uploads/0555df50-cd91-4e2c-95d7-7009f8e63ef9.png" 
-                  alt="Eka" 
-                  className="w-6 h-6 object-contain"
-                />
-              </div>
-              <h3 className="text-2xl font-bold tracking-wider">EKA</h3>
-            </div>
-            <p className="text-white/60 max-w-md mx-auto">
-              Afromodern luxury fashion for the discerning few. Membership by invitation only.
-            </p>
-            <div className="border-t border-white/20 pt-6">
-              <p className="text-white/40 text-sm">
-                © 2024 Eka. All rights reserved. Exclusivity guaranteed.
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <EkaFooter />
     </div>
   );
 };
