@@ -1,103 +1,157 @@
-
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 import { EkaHeader } from "@/components/EkaHeader";
-import { EkaFooter } from "@/components/EkaFooter";
 import { ProductCard } from "@/components/ProductCard";
-import { useCollection, useCollectionProducts } from "@/hooks/useCollections";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft } from "lucide-react";
+import { mockProducts, mockCollections } from "@/data/mockData";
 
 const CollectionDetails = () => {
   const { id } = useParams();
-  const { data: collection, isLoading: collectionLoading } = useCollection(id || '');
-  const { data: products, isLoading: productsLoading } = useCollectionProducts(id || '');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Load fonts
+    const loadFonts = () => {
+      const link1 = document.createElement('link');
+      link1.href = 'https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap';
+      link1.rel = 'stylesheet';
+      document.head.appendChild(link1);
+
+      const link2 = document.createElement('link');
+      link2.href = 'https://fonts.googleapis.com/css2?family=Arapey:ital@0;1&display=swap';
+      link2.rel = 'stylesheet';
+      document.head.appendChild(link2);
+    };
+    loadFonts();
   }, []);
 
-  if (collectionLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-hero">
-        <EkaHeader />
-        <div className="container mx-auto px-4 py-20">
-          <div className="text-center">
-            <Skeleton className="h-12 w-64 mx-auto mb-4" />
-            <Skeleton className="h-6 w-96 mx-auto" />
-          </div>
-        </div>
-        <EkaFooter />
-      </div>
-    );
-  }
-
+  const collection = mockCollections.find(c => c.id === id);
+  
   if (!collection) {
     return (
-      <div className="min-h-screen bg-gradient-hero">
+      <div className="min-h-screen bg-background">
         <EkaHeader />
-        <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-4xl font-heading text-eka-pearl mb-4">Collection Not Found</h1>
-          <Link to="/collections" className="text-eka-golden hover:text-eka-pearl transition-colors">
-            Back to Collections
-          </Link>
+        <div className="container mx-auto px-4 py-20">
+          <p>Collection not found</p>
         </div>
-        <EkaFooter />
       </div>
     );
   }
 
+  const collectionProducts = mockProducts.filter(p => p.collection === collection.name);
+
+  const getTierBadge = () => {
+    switch (collection.tier) {
+      case "A":
+        return <Badge variant="secondary" className="bg-golden-grace text-white">Full Access</Badge>;
+      case "B":
+        return <Badge variant="outline" className="border-serene-sage">Limited View</Badge>;
+      case "C":
+        return <Badge variant="destructive" className="bg-obsidian-depth">Restricted</Badge>;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
+    <div className="min-h-screen bg-background">
       <EkaHeader />
       
-      <div className="container mx-auto px-4 py-20 relative z-10">
-        <Link 
-          to="/collections" 
-          className="inline-flex items-center text-eka-champagne hover:text-eka-golden transition-colors mb-8"
+      <div className="container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate(-1)}
+          className="mb-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Collections
-        </Link>
+        </Button>
 
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-heading text-eka-pearl mb-6">{collection.name}</h1>
-          <p className="text-xl text-eka-champagne max-w-3xl mx-auto leading-relaxed">
-            {collection.description}
-          </p>
-          {collection.featured && (
-            <div className="mt-4">
-              <span className="inline-block px-4 py-2 rounded-full bg-eka-golden/20 text-eka-golden border border-eka-golden/30">
-                Featured Collection
-              </span>
+        {/* Collection Story Section */}
+        <div className="mb-16">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-4xl md:text-5xl font-heading font-normal text-obsidian-depth">
+                    {collection.name}
+                  </h1>
+                  {getTierBadge()}
+                </div>
+                
+                <p className="text-lg text-nurturing-jade font-medium uppercase tracking-wider">
+                  {collection.season}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <h2 className="text-2xl font-heading font-normal text-obsidian-depth">
+                  Collection Story
+                </h2>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  {collection.description}
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-obsidian-depth">
+                  Collection Philosophy
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  This collection represents our vision of Afromodern luxury, where traditional craftsmanship 
+                  meets contemporary design. Each piece tells a story of cultural heritage reimagined for the 
+                  modern world, creating timeless elegance that transcends fleeting trends.
+                </p>
+              </div>
+
+              <div className="bg-pearl-mist p-6 rounded-lg">
+                <h3 className="text-lg font-semibold text-obsidian-depth mb-3">
+                  Collection Highlights
+                </h3>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li>• {collection.productCount} exclusive pieces</li>
+                  <li>• Handcrafted with sustainable luxury materials</li>
+                  <li>• Limited production run</li>
+                  <li>• Custom sizing available for select pieces</li>
+                </ul>
+              </div>
             </div>
-          )}
+
+            <div className="aspect-[4/3] rounded-lg overflow-hidden">
+              <img 
+                src={collection.image} 
+                alt={collection.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {productsLoading ? (
-            Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-gradient-glass backdrop-blur-xl rounded-3xl p-6 border border-eka-jade-luxury/30">
-                <Skeleton className="w-full h-48 rounded-2xl mb-4" />
-                <Skeleton className="h-6 w-3/4 mb-2" />
-                <Skeleton className="h-4 w-1/2 mb-2" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
-            ))
-          ) : products && products.length > 0 ? (
-            products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-16">
-              <h3 className="text-2xl font-heading text-eka-pearl mb-4">No Products Found</h3>
-              <p className="text-eka-champagne">This collection doesn't have any products yet.</p>
-            </div>
-          )}
+        {/* Collection Products */}
+        <div className="space-y-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-heading font-normal text-obsidian-depth mb-4">
+              Collection Pieces
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Discover every piece in this carefully curated collection, each designed to complement 
+              and elevate your personal style.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {collectionProducts.map((product) => (
+              <ProductCard 
+                key={product.id} 
+                product={product}
+              />
+            ))}
+          </div>
         </div>
       </div>
-
-      <EkaFooter />
     </div>
   );
 };

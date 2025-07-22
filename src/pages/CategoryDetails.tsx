@@ -1,90 +1,135 @@
 
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
 import { EkaHeader } from "@/components/EkaHeader";
 import { EkaFooter } from "@/components/EkaFooter";
 import { ProductCard } from "@/components/ProductCard";
-import { useCategory, useCategoryProducts } from "@/hooks/useCategories";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { mockProducts } from "@/data/mockData";
 
 const CategoryDetails = () => {
-  const { category: categoryId } = useParams();
-  const { data: category, isLoading: categoryLoading } = useCategory(categoryId || '');
-  const { data: products, isLoading: productsLoading } = useCategoryProducts(categoryId || '');
+  const { category } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // Scroll to top when component mounts
     window.scrollTo(0, 0);
+    
+    // Load fonts
+    const loadFonts = () => {
+      const link1 = document.createElement('link');
+      link1.href = 'https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap';
+      link1.rel = 'stylesheet';
+      document.head.appendChild(link1);
+
+      const link2 = document.createElement('link');
+      link2.href = 'https://fonts.googleapis.com/css2?family=Arapey:ital@0;1&display=swap';
+      link2.rel = 'stylesheet';
+      document.head.appendChild(link2);
+    };
+    loadFonts();
   }, []);
 
-  if (categoryLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-hero">
-        <EkaHeader />
-        <div className="container mx-auto px-4 py-20">
-          <div className="text-center">
-            <Skeleton className="h-12 w-64 mx-auto mb-4" />
-            <Skeleton className="h-6 w-96 mx-auto" />
-          </div>
-        </div>
-        <EkaFooter />
-      </div>
-    );
-  }
+  const categoryProducts = mockProducts.filter(p => 
+    p.category.toLowerCase() === category?.toLowerCase()
+  );
 
-  if (!category) {
-    return (
-      <div className="min-h-screen bg-gradient-hero">
-        <EkaHeader />
-        <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-4xl font-heading text-eka-pearl mb-4">Category Not Found</h1>
-          <Link to="/products" className="text-eka-golden hover:text-eka-pearl transition-colors">
-            Back to Categories
-          </Link>
-        </div>
-        <EkaFooter />
-      </div>
-    );
-  }
+  const getCategoryDescription = () => {
+    switch (category?.toLowerCase()) {
+      case 'tops':
+        return {
+          title: 'Tops',
+          description: 'Sophisticated blouses, blazers, and statement pieces designed for the modern professional.',
+          philosophy: 'Our tops collection embodies the perfect balance of structure and fluidity, creating pieces that transition seamlessly from boardroom to evening soirée.'
+        };
+      case 'bottoms':
+        return {
+          title: 'Bottoms',
+          description: 'Tailored trousers, elegant skirts, and contemporary silhouettes for every occasion.',
+          philosophy: 'Precision tailoring meets contemporary design in our bottoms collection, where every cut and seam is crafted to enhance the natural elegance of movement.'
+        };
+      case 'ensembles':
+        return {
+          title: 'Ensembles',
+          description: 'Complete coordinated sets and statement dresses that embody Afromodern elegance.',
+          philosophy: 'Our ensembles represent the pinnacle of coordinated luxury, where each piece works in harmony to create a complete vision of sophisticated style.'
+        };
+      case 'accessories':
+        return {
+          title: 'Accessories',
+          description: 'Luxury jewelry, handbags, and finishing touches that complete your distinctive look.',
+          philosophy: 'The perfect accessories are not just additions—they are the exclamation point of personal style, carefully crafted to elevate every ensemble.'
+        };
+      default:
+        return {
+          title: category || 'Category',
+          description: 'Explore our carefully curated selection of luxury fashion pieces.',
+          philosophy: 'Each piece in this category represents our commitment to exceptional craftsmanship and contemporary design.'
+        };
+    }
+  };
+
+  const categoryInfo = getCategoryDescription();
 
   return (
     <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
+      {/* Subtle decorative pattern overlays */}
+      <div className="absolute top-0 right-0 w-1/4 h-1/2 pattern-subtle opacity-30" />
+      <div className="absolute bottom-0 left-0 w-1/6 h-1/3 pattern-accent opacity-20" />
+      
       <EkaHeader />
       
-      <div className="container mx-auto px-4 py-20 relative z-10">
-        <Link 
-          to="/products" 
-          className="inline-flex items-center text-eka-champagne hover:text-eka-golden transition-colors mb-8"
+      <div className="container mx-auto px-4 py-8 relative z-10">
+        {/* Back Button */}
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate(-1)}
+          className="mb-6 text-eka-pearl hover:text-eka-golden"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Categories
-        </Link>
+        </Button>
 
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-heading text-eka-pearl mb-6">{category.name}</h1>
-          <p className="text-xl text-eka-champagne max-w-3xl mx-auto leading-relaxed">
-            {category.description}
+        {/* Category Introduction */}
+        <div className="text-center mb-16 space-y-6">
+          <h1 className="text-4xl md:text-5xl font-heading font-normal text-obsidian-depth">
+            {categoryInfo.title}
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            {categoryInfo.description}
           </p>
+          
+          <div className="bg-pearl-mist p-8 rounded-lg max-w-4xl mx-auto">
+            <h2 className="text-2xl font-heading font-normal text-obsidian-depth mb-4">
+              Our Philosophy
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              {categoryInfo.philosophy}
+            </p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {productsLoading ? (
-            Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-gradient-glass backdrop-blur-xl rounded-3xl p-6 border border-eka-jade-luxury/30">
-                <Skeleton className="w-full h-48 rounded-2xl mb-4" />
-                <Skeleton className="h-6 w-3/4 mb-2" />
-                <Skeleton className="h-4 w-1/2 mb-2" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
-            ))
-          ) : products && products.length > 0 ? (
-            products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-16">
-              <h3 className="text-2xl font-heading text-eka-pearl mb-4">No Products Found</h3>
-              <p className="text-eka-champagne">This category doesn't have any products yet.</p>
+        {/* Products Grid */}
+        <div className="space-y-8">
+          <div className="text-center">
+            <p className="text-lg text-muted-foreground">
+              {categoryProducts.length} pieces available
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {categoryProducts.map((product) => (
+              <ProductCard 
+                key={product.id} 
+                product={product}
+              />
+            ))}
+          </div>
+
+          {categoryProducts.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No products found in this category.</p>
             </div>
           )}
         </div>
