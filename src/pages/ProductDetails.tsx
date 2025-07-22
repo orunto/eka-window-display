@@ -1,226 +1,194 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+
+import { useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { ArrowLeft, ShoppingCart, Heart } from "lucide-react";
 import { EkaHeader } from "@/components/EkaHeader";
 import { EkaFooter } from "@/components/EkaFooter";
-import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { LoginModal } from "@/components/LoginModal";
-import { ArrowLeft, Lock, ShoppingBag, Heart } from "lucide-react";
-import { mockProducts } from "@/data/mockData";
+import { useProduct } from "@/hooks/useProducts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { data: product, isLoading } = useProduct(id || '');
 
   useEffect(() => {
-    // Scroll to top when component mounts
     window.scrollTo(0, 0);
-    
-    // Load fonts
-    const loadFonts = () => {
-      const link1 = document.createElement('link');
-      link1.href = 'https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap';
-      link1.rel = 'stylesheet';
-      document.head.appendChild(link1);
-
-      const link2 = document.createElement('link');
-      link2.href = 'https://fonts.googleapis.com/css2?family=Arapey:ital@0;1&display=swap';
-      link2.rel = 'stylesheet';
-      document.head.appendChild(link2);
-    };
-    loadFonts();
   }, []);
 
-  const product = mockProducts.find(p => p.id === id);
-  
-  if (!product) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-hero">
         <EkaHeader />
         <div className="container mx-auto px-4 py-20">
-          <p>Product not found</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <Skeleton className="w-full aspect-square rounded-3xl" />
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-3/4" />
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-8 w-1/3" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          </div>
         </div>
+        <EkaFooter />
       </div>
     );
   }
 
-  // Mock multiple images for carousel
-  const productImages = [product.image, product.image, product.image];
-  
-  const relatedProducts = mockProducts
-    .filter(p => p.collection === product.collection && p.id !== product.id)
-    .slice(0, 4);
-
-  const handlePurchaseClick = () => {
-    setIsLoginOpen(true);
-  };
-
-  const getTierBadge = () => {
-    switch (product.tier) {
-      case "A":
-        return <Badge variant="secondary" className="bg-golden-grace text-white">Full Access</Badge>;
-      case "B":
-        return <Badge variant="outline" className="border-serene-sage">Limited View</Badge>;
-      case "C":
-        return <Badge variant="destructive" className="bg-obsidian-depth">Restricted</Badge>;
-      default:
-        return null;
-    }
-  };
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-gradient-hero">
+        <EkaHeader />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <h1 className="text-4xl font-heading text-eka-pearl mb-4">Product Not Found</h1>
+          <Link to="/" className="text-eka-golden hover:text-eka-pearl transition-colors">
+            Back to Home
+          </Link>
+        </div>
+        <EkaFooter />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
-      {/* Subtle decorative pattern overlays */}
-      <div className="absolute top-0 right-0 w-1/4 h-1/2 pattern-subtle opacity-30" />
-      <div className="absolute bottom-0 left-0 w-1/6 h-1/3 pattern-accent opacity-20" />
-      
       <EkaHeader />
       
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        {/* Back Button */}
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate(-1)}
-          className="mb-6"
+      <div className="container mx-auto px-4 py-20 relative z-10">
+        <Link 
+          to="/" 
+          className="inline-flex items-center text-eka-champagne hover:text-eka-golden transition-colors mb-8"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </Button>
+          Back to Home
+        </Link>
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Image Carousel */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Product Image */}
           <div className="space-y-4">
-            <div className="aspect-[4/5] overflow-hidden rounded-lg bg-pearl-mist">
+            <div className="aspect-square rounded-3xl overflow-hidden bg-gradient-glass backdrop-blur-xl border border-eka-jade-luxury/30">
               <img 
-                src={productImages[currentImageIndex]} 
+                src={product.image_url || '/placeholder.svg'} 
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
             </div>
             
-            {/* Image Thumbnails */}
-            <div className="flex gap-2">
-              {productImages.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`aspect-square w-20 rounded-md overflow-hidden border-2 ${
-                    currentImageIndex === index ? 'border-nurturing-jade' : 'border-transparent'
-                  }`}
-                >
-                  <img 
-                    src={image} 
-                    alt={`${product.name} ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
+            {/* Gallery Images */}
+            {product.gallery_images && product.gallery_images.length > 1 && (
+              <div className="grid grid-cols-4 gap-4">
+                {product.gallery_images.slice(1, 5).map((image, index) => (
+                  <div key={index} className="aspect-square rounded-xl overflow-hidden bg-gradient-glass backdrop-blur-xl border border-eka-jade-luxury/30">
+                    <img 
+                      src={image} 
+                      alt={`${product.name} ${index + 1}`}
+                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300 cursor-pointer"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Product Information */}
+          {/* Product Info */}
           <div className="space-y-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl md:text-4xl font-heading font-normal text-obsidian-depth">
-                  {product.name}
-                </h1>
-                {getTierBadge()}
+            <div>
+              <div className="flex items-center gap-4 mb-2">
+                <h1 className="text-4xl md:text-5xl font-heading text-eka-pearl">{product.name}</h1>
+                {product.tier && (
+                  <span className="px-3 py-1 rounded-full bg-eka-jade-luxury/20 text-eka-golden border border-eka-golden/30">
+                    Tier {product.tier}
+                  </span>
+                )}
               </div>
               
-              {product.collection && (
-                <p className="text-lg text-nurturing-jade font-medium">
-                  {product.collection} Collection
-                </p>
+              <div className="flex items-center gap-4 text-eka-champagne">
+                {product.categories && (
+                  <span>{product.categories.name}</span>
+                )}
+                {product.collections && (
+                  <>
+                    <span>•</span>
+                    <span>{product.collections.name}</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {product.price && (
+              <div className="text-3xl font-bold text-eka-golden">
+                ${product.price.toFixed(2)}
+              </div>
+            )}
+
+            <div className="flex items-center gap-4">
+              {product.featured && (
+                <span className="px-3 py-1 rounded-full bg-eka-golden/20 text-eka-golden">
+                  Featured
+                </span>
               )}
-              
-              <p className="text-sm text-muted-foreground uppercase tracking-wider">
-                {product.category}
-              </p>
+              <span className={`px-3 py-1 rounded-full ${
+                product.in_stock 
+                  ? 'bg-green-500/20 text-green-400' 
+                  : 'bg-red-500/20 text-red-400'
+              }`}>
+                {product.in_stock ? 'In Stock' : 'Out of Stock'}
+              </span>
             </div>
 
-            {/* Price */}
-            {product.tier === "A" && product.price && (
-              <div className="text-2xl font-bold text-obsidian-depth">
-                ${product.price.toLocaleString()}
+            {product.description && (
+              <div className="prose prose-invert max-w-none">
+                <p className="text-eka-champagne leading-relaxed text-lg">
+                  {product.description}
+                </p>
               </div>
             )}
 
-            {product.tier === "B" && (
-              <div className="relative">
-                <div className="text-2xl font-bold text-obsidian-depth blur-sm">
-                  $XX,XXX
-                </div>
-                <div className="absolute inset-0 flex items-center gap-2 text-muted-foreground">
-                  <Lock className="w-5 h-5" />
-                  <span>Price available to clients</span>
+            {/* Product Variants */}
+            {product.product_variants && product.product_variants.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-xl font-heading text-eka-pearl">Available Options</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {product.product_variants.map((variant) => (
+                    <div key={variant.id} className="p-3 rounded-xl bg-gradient-glass backdrop-blur-xl border border-eka-jade-luxury/30">
+                      <div className="flex justify-between items-center">
+                        <span className="text-eka-pearl font-medium">{variant.name}</span>
+                        {variant.price_adjustment > 0 && (
+                          <span className="text-eka-golden text-sm">+${variant.price_adjustment}</span>
+                        )}
+                      </div>
+                      <div className="text-eka-champagne text-sm">
+                        {variant.type} • {variant.stock_quantity} available
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* Description */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-obsidian-depth">Description</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {product.description}
-              </p>
-            </div>
-
-            {/* Story */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-obsidian-depth">Story</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                This piece embodies the essence of Afromodern luxury, where contemporary design meets cultural heritage. 
-                Crafted with meticulous attention to detail, it represents our commitment to creating fashion that transcends trends.
-              </p>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-4 pt-6">
               <Button 
-                variant="exclusive" 
-                className="flex-1"
-                onClick={handlePurchaseClick}
+                className="flex-1 bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth font-semibold py-3 text-lg"
+                disabled={!product.in_stock}
               >
-                <ShoppingBag className="w-4 h-4 mr-2" />
-                Purchase - Client Login Required
+                <ShoppingCart className="w-5 h-5 mr-2" />
+                {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
               </Button>
               
               <Button 
                 variant="outline" 
-                size="icon"
-                onClick={handlePurchaseClick}
+                size="lg"
+                className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
               >
-                <Heart className="w-4 h-4" />
+                <Heart className="w-5 h-5" />
               </Button>
             </div>
           </div>
         </div>
-
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <div className="mt-20">
-            <h2 className="text-2xl font-heading font-normal text-obsidian-depth mb-8">
-              More from {product.collection} Collection
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedProducts.map((relatedProduct) => (
-                <ProductCard 
-                  key={relatedProduct.id} 
-                  product={relatedProduct}
-                />
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       <EkaFooter />
-      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </div>
   );
 };
