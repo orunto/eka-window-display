@@ -9,8 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 
 const Admin = () => {
   const [user, setUser] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(true); // Temporarily set to true for testing
+  const [loading, setLoading] = useState(false); // Set to false to skip loading
   const { toast } = useToast();
 
   useEffect(() => {
@@ -31,24 +31,25 @@ const Admin = () => {
     };
     loadFonts();
 
-    // Check initial auth state
-    checkUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        await checkAdminStatus(session.user.id);
-      } else {
-        setUser(null);
-        setIsAdmin(false);
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    // Temporarily bypass authentication for testing
+    // Uncomment the code below to restore authentication:
+    
+    // checkUser();
+    // const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    //   if (session?.user) {
+    //     setUser(session.user);
+    //     await checkAdminStatus(session.user.id);
+    //   } else {
+    //     setUser(null);
+    //     setIsAdmin(false);
+    //   }
+    //   setLoading(false);
+    // });
+    // return () => subscription.unsubscribe();
   }, []);
 
+  // Commented out for testing - uncomment to restore auth functionality
+  /*
   const checkUser = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -86,6 +87,7 @@ const Admin = () => {
       console.error('Error checking admin status:', error);
     }
   };
+  */
 
   if (loading) {
     return (
@@ -100,6 +102,7 @@ const Admin = () => {
       <EkaHeader />
       
       <div className="container mx-auto px-4 py-20 relative z-10">
+        {/* Temporarily bypass auth check - uncomment below to restore:
         {!user ? (
           <AdminAuth />
         ) : !isAdmin ? (
@@ -112,6 +115,10 @@ const Admin = () => {
         ) : (
           <AdminDashboard />
         )}
+        */}
+        
+        {/* Direct access to admin dashboard for testing */}
+        <AdminDashboard />
       </div>
 
       <EkaFooter />
