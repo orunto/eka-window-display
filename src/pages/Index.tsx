@@ -3,10 +3,15 @@ import { EkaHeader } from "@/components/EkaHeader";
 import { ProductCard } from "@/components/ProductCard";
 import { EkaFooter } from "@/components/EkaFooter";
 import { mockProducts } from "@/data/mockData";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
-  // Only show featured products (Tier A products)
-  const featuredProducts = mockProducts.filter(product => product.tier === "A").slice(0, 6);
+  const { user } = useAuth();
+  
+  // Show featured products and tier C products if user is logged in
+  const featuredProducts = user 
+    ? mockProducts.filter(product => product.tier === "A" || product.tier === "C").slice(0, 8)
+    : mockProducts.filter(product => product.tier === "A").slice(0, 6);
 
   return (
     <div className="min-h-screen bg-gradient-hero relative overflow-hidden">

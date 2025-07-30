@@ -1,11 +1,20 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Search, User, ShoppingBag, Menu } from "lucide-react";
+import { Search, User, ShoppingBag, Menu, LogOut, CheckCircle } from "lucide-react";
 import { LoginModal } from "./LoginModal";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const EkaHeader = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, signOut, loading } = useAuth();
 
   return (
     <>
@@ -42,13 +51,38 @@ export const EkaHeader = () => {
               <Button variant="ghost" size="icon" className="hidden md:flex">
                 <Search className="w-5 h-5" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => setIsLoginOpen(true)}
-              >
-                <User className="w-5 h-5" />
-              </Button>
+              
+              {/* User Authentication */}
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="relative">
+                      <User className="w-5 h-5" />
+                      <CheckCircle className="w-3 h-3 absolute -top-1 -right-1 text-eka-golden fill-current" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="px-2 py-1.5">
+                      <p className="text-sm font-medium">{user.user_metadata?.full_name || user.email}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={signOut}>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => setIsLoginOpen(true)}
+                  disabled={loading}
+                >
+                  <User className="w-5 h-5" />
+                </Button>
+              )}
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingBag className="w-5 h-5" />
                 <span className="absolute -top-1 -right-1 bg-golden-grace text-xs rounded-full w-5 h-5 flex items-center justify-center text-white font-medium">
