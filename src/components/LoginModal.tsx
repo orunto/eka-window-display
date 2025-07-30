@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Lock, Eye, EyeOff } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -14,11 +16,98 @@ interface LoginModalProps {
 export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showClientApp, setShowClientApp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [profession, setProfession] = useState("");
+  const [reason, setReason] = useState("");
+  const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Login logic would go here
-    console.log("Login attempted");
+    setLoading(true);
+
+    try {
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              full_name: fullName
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Account created",
+          description: "Please check your email for verification link",
+        });
+        onClose();
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in",
+        });
+        onClose();
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClientAppSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: fullName,
+            profession,
+            application_reason: reason
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Application submitted",
+        description: "Your account has been created. Please check your email for verification.",
+      });
+      onClose();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (showClientApp) {
@@ -48,13 +137,16 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
 
             <Separator />
 
-            <div className="space-y-4">
+            <form onSubmit={handleClientAppSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
                 <Input 
                   id="name" 
                   placeholder="Enter your full name"
                   className="mt-1"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
                 />
               </div>
               
@@ -65,6 +157,22 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                   type="email"
                   placeholder="Enter your email"
                   className="mt-1"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                <Input 
+                  id="password" 
+                  type="password"
+                  placeholder="Create a password"
+                  className="mt-1"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
               </div>
 
@@ -74,6 +182,8 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                   id="profession" 
                   placeholder="Your profession or industry"
                   className="mt-1"
+                  value={profession}
+                  onChange={(e) => setProfession(e.target.value)}
                 />
               </div>
 
@@ -86,23 +196,29 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                   rows={4}
                   placeholder="Tell us about your interest in Eka and our exclusive fashion philosophy..."
                   className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
                 />
               </div>
-            </div>
+            </form>
 
             <div className="flex space-x-3">
               <Button 
                 variant="outline" 
                 onClick={() => setShowClientApp(false)}
                 className="flex-1"
+                disabled={loading}
               >
                 Back to Login
               </Button>
               <Button 
+                type="submit"
                 variant="luxury" 
                 className="flex-1"
+                disabled={loading}
+                onClick={handleClientAppSubmit}
               >
-                Submit Application
+                {loading ? "Creating Account..." : "Submit Application"}
               </Button>
             </div>
           </div>
@@ -130,7 +246,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleAuth} className="space-y-4">
             <div>
               <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <Input 
@@ -138,6 +254,8 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                 type="email"
                 placeholder="your@email.com"
                 className="mt-1"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -148,8 +266,10 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                 <Input 
                   id="password" 
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder={isSignUp ? "Create a password" : "Enter your password"}
                   className="pr-10"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                 />
                 <Button
@@ -168,21 +288,43 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
               </div>
             </div>
 
-            <Button type="submit" variant="elegant" className="w-full">
-              Login to Eka
+            {isSignUp && (
+              <div>
+                <Label htmlFor="fullName" className="text-sm font-medium">Full Name</Label>
+                <Input 
+                  id="fullName" 
+                  placeholder="Enter your full name"
+                  className="mt-1"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+
+            <Button type="submit" variant="elegant" className="w-full" disabled={loading}>
+              {loading ? (isSignUp ? "Creating Account..." : "Signing In...") : (isSignUp ? "Create Account" : "Login to Eka")}
             </Button>
           </form>
 
           <Separator />
 
           <div className="text-center space-y-3">
+            <button
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
+            </button>
+            <Separator />
             <p className="text-sm text-muted-foreground">
-              Not yet an Eka client?
+              Want to become an exclusive client?
             </p>
             <Button 
               variant="exclusive" 
               onClick={() => setShowClientApp(true)}
               className="w-full"
+              disabled={loading}
             >
               Become an Eka Client
             </Button>
