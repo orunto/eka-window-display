@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { EkaHeader } from "@/components/EkaHeader";
@@ -6,7 +7,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LoginModal } from "@/components/LoginModal";
-import { ArrowLeft, Lock, ShoppingBag, Heart } from "lucide-react";
+import { ArrowLeft, Lock, ShoppingBag, Heart, X } from "lucide-react";
 import { mockProducts } from "@/data/mockData";
 
 const ProductDetails = () => {
@@ -14,6 +15,8 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isImageViewOpen, setIsImageViewOpen] = useState(false);
+  const [showPriceInfo, setShowPriceInfo] = useState(false);
 
   useEffect(() => {
     // Scroll to top when component mounts
@@ -71,11 +74,23 @@ const ProductDetails = () => {
     }
   };
 
+  const openImageView = (index: number) => {
+    setCurrentImageIndex(index);
+    setIsImageViewOpen(true);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
-      {/* Subtle decorative pattern overlays */}
-      <div className="absolute top-0 right-0 w-1/4 h-1/2 pattern-subtle opacity-30" />
-      <div className="absolute bottom-0 left-0 w-1/6 h-1/3 pattern-accent opacity-20" />
+    <div 
+      className="min-h-screen relative overflow-hidden"
+      style={{
+        backgroundImage: `url(/lovable-uploads/a8277916-da04-404a-a49d-3a6e73a0433f.png)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Dark overlay for better readability */}
+      <div className="absolute inset-0 bg-eka-emerald-depth/80 backdrop-blur-[1px]" />
       
       <EkaHeader />
       
@@ -84,20 +99,21 @@ const ProductDetails = () => {
         <Button 
           variant="ghost" 
           onClick={() => navigate(-1)}
-          className="mb-6"
+          className="mb-6 text-eka-pearl hover:bg-eka-jade-luxury/20"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
         </Button>
 
         <div className="grid lg:grid-cols-2 gap-12">
-          {/* Image Carousel */}
+          {/* Image Gallery */}
           <div className="space-y-4">
-            <div className="aspect-[4/5] overflow-hidden rounded-lg bg-pearl-mist">
+            <div className="aspect-[4/5] overflow-hidden rounded-lg bg-eka-pearl/10 backdrop-blur-sm">
               <img 
                 src={productImages[currentImageIndex]} 
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                onClick={() => openImageView(currentImageIndex)}
               />
             </div>
             
@@ -106,9 +122,14 @@ const ProductDetails = () => {
               {productImages.map((image, index) => (
                 <button
                   key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`aspect-square w-20 rounded-md overflow-hidden border-2 ${
-                    currentImageIndex === index ? 'border-nurturing-jade' : 'border-transparent'
+                  onClick={() => {
+                    setCurrentImageIndex(index);
+                    openImageView(index);
+                  }}
+                  className={`aspect-square w-20 rounded-md overflow-hidden border-2 transition-all duration-300 ${
+                    currentImageIndex === index 
+                      ? 'border-eka-golden shadow-glow' 
+                      : 'border-transparent hover:border-eka-jade-luxury'
                   }`}
                 >
                   <img 
@@ -122,59 +143,59 @@ const ProductDetails = () => {
           </div>
 
           {/* Product Information */}
-          <div className="space-y-6">
+          <div className="space-y-6 bg-eka-emerald-depth/60 backdrop-blur-md rounded-2xl p-8 border border-eka-jade-luxury/30">
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <h1 className="text-3xl md:text-4xl font-heading font-normal text-obsidian-depth">
+                <h1 className="text-3xl md:text-4xl font-heading font-normal text-eka-pearl">
                   {product.name}
                 </h1>
                 {getTierBadge()}
               </div>
               
               {product.collection && (
-                <p className="text-lg text-nurturing-jade font-medium">
+                <p className="text-lg text-eka-golden font-medium">
                   {product.collection} Collection
                 </p>
               )}
               
-              <p className="text-sm text-muted-foreground uppercase tracking-wider">
+              <p className="text-sm text-eka-champagne uppercase tracking-wider">
                 {product.category}
               </p>
             </div>
 
             {/* Price */}
             {product.tier === "A" && product.price && (
-              <div className="text-2xl font-bold text-obsidian-depth">
+              <div className="text-2xl font-bold text-eka-pearl">
                 ${product.price.toLocaleString()}
               </div>
             )}
 
             {product.tier === "B" && (
-              <div className="relative">
-                <div className="text-2xl font-bold text-obsidian-depth blur-sm">
+              <div className="flex items-center gap-4">
+                <div className="text-2xl font-bold text-eka-pearl blur-sm select-none">
                   $XX,XXX
                 </div>
-                <div className="absolute inset-0 flex items-center gap-2 text-muted-foreground">
+                <div 
+                  className="flex items-center gap-2 text-eka-champagne cursor-pointer hover:text-eka-golden transition-colors"
+                  onClick={() => setShowPriceInfo(!showPriceInfo)}
+                  onMouseEnter={() => setShowPriceInfo(true)}
+                  onMouseLeave={() => setShowPriceInfo(false)}
+                >
                   <Lock className="w-5 h-5" />
-                  <span>Price available to clients</span>
+                  {showPriceInfo && (
+                    <span className="text-sm bg-eka-jade-luxury/60 backdrop-blur-sm px-3 py-1 rounded-md border border-eka-jade-luxury/30">
+                      Price available to clients
+                    </span>
+                  )}
                 </div>
               </div>
             )}
 
             {/* Description */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-obsidian-depth">Description</h3>
-              <p className="text-muted-foreground leading-relaxed">
+              <h3 className="text-lg font-semibold text-eka-pearl">Description</h3>
+              <p className="text-eka-champagne leading-relaxed">
                 {product.description}
-              </p>
-            </div>
-
-            {/* Story */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-obsidian-depth">Story</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                This piece embodies the essence of Afromodern luxury, where contemporary design meets cultural heritage. 
-                Crafted with meticulous attention to detail, it represents our commitment to creating fashion that transcends trends.
               </p>
             </div>
 
@@ -182,7 +203,7 @@ const ProductDetails = () => {
             <div className="flex gap-3 pt-4">
               <Button 
                 variant="exclusive" 
-                className="flex-1"
+                className="flex-1 bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth"
                 onClick={handlePurchaseClick}
               >
                 <ShoppingBag className="w-4 h-4 mr-2" />
@@ -193,6 +214,7 @@ const ProductDetails = () => {
                 variant="outline" 
                 size="icon"
                 onClick={handlePurchaseClick}
+                className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
               >
                 <Heart className="w-4 h-4" />
               </Button>
@@ -203,7 +225,7 @@ const ProductDetails = () => {
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="mt-20">
-            <h2 className="text-2xl font-heading font-normal text-obsidian-depth mb-8">
+            <h2 className="text-2xl font-heading font-normal text-eka-pearl mb-8">
               More from {product.collection} Collection
             </h2>
             
@@ -218,6 +240,51 @@ const ProductDetails = () => {
           </div>
         )}
       </div>
+
+      {/* Image Viewer Modal */}
+      {isImageViewOpen && (
+        <div className="fixed inset-0 z-50 bg-eka-emerald-depth/95 backdrop-blur-md flex items-center justify-center">
+          <div className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center p-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsImageViewOpen(false)}
+              className="absolute top-4 right-4 z-10 text-eka-pearl hover:bg-eka-jade-luxury/20"
+            >
+              <X className="w-6 h-6" />
+            </Button>
+            
+            <img
+              src={productImages[currentImageIndex]}
+              alt={`${product.name} ${currentImageIndex + 1}`}
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+            
+            {/* Navigation arrows */}
+            {productImages.length > 1 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setCurrentImageIndex((prev) => (prev - 1 + productImages.length) % productImages.length)}
+                  className="absolute left-4 text-eka-pearl hover:bg-eka-jade-luxury/20"
+                >
+                  <ArrowLeft className="w-6 h-6" />
+                </Button>
+                
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setCurrentImageIndex((prev) => (prev + 1) % productImages.length)}
+                  className="absolute right-4 text-eka-pearl hover:bg-eka-jade-luxury/20"
+                >
+                  <ArrowLeft className="w-6 h-6 rotate-180" />
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <EkaFooter />
       <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
