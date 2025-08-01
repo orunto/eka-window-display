@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { EkaHeader } from "@/components/EkaHeader";
@@ -64,11 +63,11 @@ const ProductDetails = () => {
   const getTierBadge = () => {
     switch (product.tier) {
       case "A":
-        return <Badge variant="secondary" className="bg-golden-grace text-white">Full Access</Badge>;
+        return <Badge variant="secondary" className="bg-golden-grace text-white text-xs sm:text-sm">Full Access</Badge>;
       case "B":
-        return <Badge variant="outline" className="border-serene-sage">Limited View</Badge>;
+        return <Badge variant="outline" className="border-serene-sage text-xs sm:text-sm">Limited View</Badge>;
       case "C":
-        return <Badge variant="destructive" className="bg-obsidian-depth">Restricted</Badge>;
+        return <Badge variant="destructive" className="bg-obsidian-depth text-xs sm:text-sm">Restricted</Badge>;
       default:
         return null;
     }
@@ -94,31 +93,32 @@ const ProductDetails = () => {
       
       <EkaHeader />
       
-      <div className="container mx-auto px-4 py-8 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 relative z-10">
         {/* Back Button */}
         <Button 
           variant="ghost" 
           onClick={() => navigate(-1)}
-          className="mb-6 text-eka-pearl hover:bg-eka-jade-luxury/20"
+          className="mb-4 sm:mb-6 text-eka-pearl hover:bg-eka-jade-luxury/20 touch-manipulation"
+          size="sm"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          <span className="hidden sm:inline">Back</span>
         </Button>
 
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-12">
           {/* Image Gallery */}
-          <div className="space-y-4">
-            <div className="aspect-[4/5] overflow-hidden rounded-lg bg-eka-pearl/10 backdrop-blur-sm">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="aspect-[4/5] overflow-hidden rounded-lg bg-eka-pearl/10 backdrop-blur-sm touch-manipulation">
               <img 
                 src={productImages[currentImageIndex]} 
                 alt={product.name}
-                className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300 touch-manipulation"
                 onClick={() => openImageView(currentImageIndex)}
               />
             </div>
             
             {/* Image Thumbnails */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
               {productImages.map((image, index) => (
                 <button
                   key={index}
@@ -126,7 +126,7 @@ const ProductDetails = () => {
                     setCurrentImageIndex(index);
                     openImageView(index);
                   }}
-                  className={`aspect-square w-20 rounded-md overflow-hidden border-2 transition-all duration-300 ${
+                  className={`flex-shrink-0 aspect-square w-16 sm:w-20 rounded-md overflow-hidden border-2 transition-all duration-300 touch-manipulation ${
                     currentImageIndex === index 
                       ? 'border-eka-golden shadow-glow' 
                       : 'border-transparent hover:border-eka-jade-luxury'
@@ -143,78 +143,76 @@ const ProductDetails = () => {
           </div>
 
           {/* Product Information */}
-          <div className="space-y-6 bg-eka-emerald-depth/60 backdrop-blur-md rounded-2xl p-8 border border-eka-jade-luxury/30">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl md:text-4xl font-heading font-normal text-eka-pearl">
+          <div className="space-y-4 sm:space-y-6 bg-eka-emerald-depth/60 backdrop-blur-md rounded-2xl p-4 sm:p-6 lg:p-8 border border-eka-jade-luxury/30">
+            <div className="space-y-2 sm:space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-heading font-normal text-eka-pearl leading-tight">
                   {product.name}
                 </h1>
                 {getTierBadge()}
               </div>
               
               {product.collection && (
-                <p className="text-lg text-eka-golden font-medium">
+                <p className="text-base sm:text-lg text-eka-golden font-medium">
                   {product.collection} Collection
                 </p>
               )}
               
-              <p className="text-sm text-eka-champagne uppercase tracking-wider">
+              <p className="text-xs sm:text-sm text-eka-champagne uppercase tracking-wider">
                 {product.category}
               </p>
             </div>
 
             {/* Price */}
             {product.tier === "A" && product.price && (
-              <div className="text-2xl font-bold text-eka-pearl">
+              <div className="text-xl sm:text-2xl font-bold text-eka-pearl">
                 ${product.price.toLocaleString()}
               </div>
             )}
 
             {product.tier === "B" && (
-              <div className="flex items-center gap-4">
-                <div className="text-2xl font-bold text-eka-pearl blur-sm select-none">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                <div className="text-xl sm:text-2xl font-bold text-eka-pearl blur-sm select-none">
                   $XX,XXX
                 </div>
                 <div 
-                  className="flex items-center gap-2 text-eka-champagne cursor-pointer hover:text-eka-golden transition-colors"
+                  className="flex items-center gap-2 text-eka-champagne cursor-pointer hover:text-eka-golden transition-colors touch-manipulation"
                   onClick={() => setShowPriceInfo(!showPriceInfo)}
-                  onMouseEnter={() => setShowPriceInfo(true)}
-                  onMouseLeave={() => setShowPriceInfo(false)}
+                  onTouchStart={() => setShowPriceInfo(true)}
+                  onTouchEnd={() => setTimeout(() => setShowPriceInfo(false), 2000)}
                 >
-                  <Lock className="w-5 h-5" />
-                  {showPriceInfo && (
-                    <span className="text-sm bg-eka-jade-luxury/60 backdrop-blur-sm px-3 py-1 rounded-md border border-eka-jade-luxury/30">
-                      Price available to clients
-                    </span>
-                  )}
+                  <Lock className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                  <span className="text-sm bg-eka-jade-luxury/60 backdrop-blur-sm px-3 py-1 rounded-md border border-eka-jade-luxury/30">
+                    Price available to clients
+                  </span>
                 </div>
               </div>
             )}
 
             {/* Description */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-eka-pearl">Description</h3>
-              <p className="text-eka-champagne leading-relaxed">
+            <div className="space-y-3 sm:space-y-4">
+              <h3 className="text-base sm:text-lg font-semibold text-eka-pearl">Description</h3>
+              <p className="text-sm sm:text-base text-eka-champagne leading-relaxed">
                 {product.description}
               </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 pt-2 sm:pt-4">
               <Button 
                 variant="exclusive" 
-                className="flex-1 bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth"
+                className="flex-1 bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth text-sm sm:text-base min-h-[44px] touch-manipulation"
                 onClick={handlePurchaseClick}
               >
-                <ShoppingBag className="w-4 h-4 mr-2" />
-                Purchase - Client Login Required
+                <ShoppingBag className="w-4 h-4 mr-2 flex-shrink-0" />
+                <span className="text-center">Purchase - Client Login Required</span>
               </Button>
               
               <Button 
                 variant="outline" 
                 size="icon"
                 onClick={handlePurchaseClick}
-                className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
+                className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20 min-h-[44px] min-w-[44px] touch-manipulation self-center sm:self-auto"
               >
                 <Heart className="w-4 h-4" />
               </Button>
@@ -224,12 +222,12 @@ const ProductDetails = () => {
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <div className="mt-20">
-            <h2 className="text-2xl font-heading font-normal text-eka-pearl mb-8">
+          <div className="mt-12 sm:mt-16 lg:mt-20">
+            <h2 className="text-xl sm:text-2xl font-heading font-normal text-eka-pearl mb-6 sm:mb-8">
               More from {product.collection} Collection
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {relatedProducts.map((relatedProduct) => (
                 <ProductCard 
                   key={relatedProduct.id} 
@@ -243,21 +241,21 @@ const ProductDetails = () => {
 
       {/* Image Viewer Modal */}
       {isImageViewOpen && (
-        <div className="fixed inset-0 z-50 bg-eka-emerald-depth/95 backdrop-blur-md flex items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-eka-emerald-depth/95 backdrop-blur-md flex items-center justify-center touch-manipulation">
           <div className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center p-4">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsImageViewOpen(false)}
-              className="absolute top-4 right-4 z-10 text-eka-pearl hover:bg-eka-jade-luxury/20"
+              className="absolute top-2 sm:top-4 right-2 sm:right-4 z-10 text-eka-pearl hover:bg-eka-jade-luxury/20 min-h-[44px] min-w-[44px] touch-manipulation"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6" />
             </Button>
             
             <img
               src={productImages[currentImageIndex]}
               alt={`${product.name} ${currentImageIndex + 1}`}
-              className="max-w-full max-h-full object-contain rounded-lg"
+              className="max-w-full max-h-full object-contain rounded-lg touch-manipulation"
             />
             
             {/* Navigation arrows */}
@@ -267,18 +265,18 @@ const ProductDetails = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => setCurrentImageIndex((prev) => (prev - 1 + productImages.length) % productImages.length)}
-                  className="absolute left-4 text-eka-pearl hover:bg-eka-jade-luxury/20"
+                  className="absolute left-2 sm:left-4 text-eka-pearl hover:bg-eka-jade-luxury/20 min-h-[44px] min-w-[44px] touch-manipulation"
                 >
-                  <ArrowLeft className="w-6 h-6" />
+                  <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                 </Button>
                 
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setCurrentImageIndex((prev) => (prev + 1) % productImages.length)}
-                  className="absolute right-4 text-eka-pearl hover:bg-eka-jade-luxury/20"
+                  className="absolute right-2 sm:right-4 text-eka-pearl hover:bg-eka-jade-luxury/20 min-h-[44px] min-w-[44px] touch-manipulation"
                 >
-                  <ArrowLeft className="w-6 h-6 rotate-180" />
+                  <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 rotate-180" />
                 </Button>
               </>
             )}

@@ -1,131 +1,177 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Search, User, ShoppingBag, Menu, LogOut, CheckCircle } from "lucide-react";
-import { LoginModal } from "./LoginModal";
+import { Menu, X, User, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
 
 export const EkaHeader = () => {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, signOut, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setIsMobileMenuOpen(false);
+  };
+
+  const navItems = [
+    { name: "Home", path: "/" },
+    { name: "Collections", path: "/collections" },
+    { name: "Categories", path: "/categories" },
+    { name: "About", path: "/about" },
+  ];
+
+  const isActivePath = (path: string) => {
+    if (path === "/" && location.pathname === "/") return true;
+    if (path !== "/" && location.pathname.startsWith(path)) return true;
+    return false;
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setIsMobileMenuOpen(false);
+  };
 
   return (
-    <>
-      <header className="bg-background/95 backdrop-blur-sm border-b border-serene-sage/30 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center space-x-4">
-              <div className="w-8 h-8 bg-gradient-luxury rounded-full flex items-center justify-center">
-                <img 
-                  src="/lovable-uploads/0555df50-cd91-4e2c-95d7-7009f8e63ef9.png" 
-                  alt="Eka" 
-                  className="w-6 h-6 object-contain"
-                />
-              </div>
-              <a href="/" className="text-2xl font-bold text-nurturing-jade tracking-wider hover:opacity-80 transition-opacity">EKA</a>
-            </div>
+    <header 
+      className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+        isScrolled 
+          ? 'bg-eka-emerald-depth/90 backdrop-blur-md shadow-lg border-b border-eka-jade-luxury/30' 
+          : 'bg-transparent'
+      }`}
+    >
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20">
+          {/* Logo */}
+          <div 
+            className="text-2xl sm:text-3xl font-heading text-eka-golden cursor-pointer touch-manipulation"
+            onClick={() => handleNavigation("/")}
+          >
+            EKA
+          </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/collections" className="text-foreground hover:text-nurturing-jade transition-colors font-medium">
-                Collections
-              </a>
-              <a href="/products" className="text-foreground hover:text-nurturing-jade transition-colors font-medium">
-                Products
-              </a>
-              <a href="/about" className="text-foreground hover:text-nurturing-jade transition-colors font-medium">
-                About
-              </a>
-            </nav>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+            {navItems.map((item) => (
+              <button
+                key={item.name}
+                onClick={() => handleNavigation(item.path)}
+                className={`text-sm lg:text-base font-medium transition-colors duration-300 hover:text-eka-golden touch-manipulation ${
+                  isActivePath(item.path) 
+                    ? 'text-eka-golden' 
+                    : 'text-eka-pearl hover:text-eka-golden'
+                }`}
+              >
+                {item.name}
+              </button>
+            ))}
+          </nav>
 
-            {/* Actions */}
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" className="hidden md:flex">
-                <Search className="w-5 h-5" />
-              </Button>
-              
-              {/* User Authentication */}
-              {user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="relative">
-                      <User className="w-5 h-5" />
-                      <CheckCircle className="w-3 h-3 absolute -top-1 -right-1 text-eka-golden fill-current" />
+          {/* User Status & Mobile Menu */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* User Status - Desktop */}
+            {!loading && (
+              <div className="hidden sm:flex items-center gap-3">
+                {user ? (
+                  <div className="flex items-center gap-2 bg-eka-jade-luxury/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-eka-golden/30">
+                    <Check className="w-4 h-4 text-eka-golden" />
+                    <span className="text-sm text-eka-pearl">Client</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleSignOut}
+                      className="text-eka-champagne hover:text-eka-golden text-xs px-2 py-1 h-auto"
+                    >
+                      Sign Out
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <div className="px-2 py-1.5">
-                      <p className="text-sm font-medium">{user.user_metadata?.full_name || user.email}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={signOut}>
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Sign out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-eka-champagne">
+                    <User className="w-4 h-4" />
+                    <span className="text-sm">Guest</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Mobile Menu */}
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  onClick={() => setIsLoginOpen(true)}
-                  disabled={loading}
+                  className="md:hidden text-eka-pearl hover:bg-eka-jade-luxury/20 min-h-[44px] min-w-[44px] touch-manipulation"
                 >
-                  <User className="w-5 h-5" />
+                  <Menu className="h-5 w-5" />
                 </Button>
-              )}
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingBag className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 bg-golden-grace text-xs rounded-full w-5 h-5 flex items-center justify-center text-white font-medium">
-                  0
-                </span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="md:hidden"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              </SheetTrigger>
+              <SheetContent 
+                side="right" 
+                className="w-[280px] sm:w-[320px] bg-eka-emerald-depth/95 backdrop-blur-md border-eka-jade-luxury/30"
               >
-                <Menu className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
+                <div className="flex flex-col space-y-6 mt-8">
+                  {/* User Status - Mobile */}
+                  {!loading && (
+                    <div className="pb-4 border-b border-eka-jade-luxury/30">
+                      {user ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-eka-golden">
+                            <Check className="w-4 h-4" />
+                            <span className="text-sm font-medium">Signed in as Client</span>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleSignOut}
+                            className="w-full border-eka-jade-luxury/30 text-eka-champagne hover:bg-eka-jade-luxury/20 min-h-[44px] touch-manipulation"
+                          >
+                            Sign Out
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-eka-champagne">
+                          <User className="w-4 h-4" />
+                          <span className="text-sm">Guest Access</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-          {/* Mobile Menu */}
-          {isMobileMenuOpen && (
-            <div className="md:hidden mt-4 pt-4 border-t border-serene-sage/30">
-              <nav className="flex flex-col space-y-3">
-                <a href="/collections" className="text-foreground hover:text-nurturing-jade transition-colors font-medium py-2">
-                  Collections
-                </a>
-                <a href="/products" className="text-foreground hover:text-nurturing-jade transition-colors font-medium py-2">
-                  Products
-                </a>
-                <a href="/about" className="text-foreground hover:text-nurturing-jade transition-colors font-medium py-2">
-                  About
-                </a>
-                <div className="pt-2">
-                  <Button variant="ghost" className="w-full justify-start">
-                    <Search className="w-5 h-5 mr-2" />
-                    Search
-                  </Button>
+                  {/* Navigation Links */}
+                  <nav className="flex flex-col space-y-4">
+                    {navItems.map((item) => (
+                      <button
+                        key={item.name}
+                        onClick={() => handleNavigation(item.path)}
+                        className={`text-left py-3 px-2 text-base font-medium transition-colors duration-300 rounded-md touch-manipulation ${
+                          isActivePath(item.path)
+                            ? 'text-eka-golden bg-eka-jade-luxury/20'
+                            : 'text-eka-pearl hover:text-eka-golden hover:bg-eka-jade-luxury/10'
+                        }`}
+                      >
+                        {item.name}
+                      </button>
+                    ))}
+                  </nav>
                 </div>
-              </nav>
-            </div>
-          )}
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
-      </header>
-
-      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
-    </>
+      </div>
+    </header>
   );
 };
