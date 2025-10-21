@@ -126,16 +126,34 @@ export default function ClientApplicationsManager() {
                   {new Date(app.created_at).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedApp(app);
-                      setNotes(app.notes || "");
-                    }}
-                  >
-                    Review
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedApp(app);
+                        setNotes(app.notes || "");
+                      }}
+                    >
+                      Review
+                    </Button>
+                    {app.status === 'approved' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          const registerUrl = `${window.location.origin}/register`;
+                          navigator.clipboard.writeText(registerUrl);
+                          toast({
+                            title: "Link Copied",
+                            description: "Registration link copied to clipboard",
+                          });
+                        }}
+                      >
+                        Copy Link
+                      </Button>
+                    )}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -17,7 +16,6 @@ interface LoginModalProps {
 
 export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("login");
   const [showApplication, setShowApplication] = useState(false);
   const { toast } = useToast();
 
@@ -25,67 +23,33 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Sign up form state
-  const [signUpEmail, setSignUpEmail] = useState("");
-  const [signUpPassword, setSignUpPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-
   // Client application form state
   const [clientEmail, setClientEmail] = useState("");
   const [clientName, setClientName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
 
-  const handleAuth = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      if (activeTab === "login") {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-        if (error) {
-          toast({
-            title: "Error",
-            description: error.message,
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Success",
-            description: "Successfully signed in!",
-          });
-          onClose();
-        }
-      } else if (activeTab === "signup") {
-        const redirectUrl = `${window.location.origin}/`;
-        
-        const { error } = await supabase.auth.signUp({
-          email: signUpEmail,
-          password: signUpPassword,
-          options: {
-            emailRedirectTo: redirectUrl,
-            data: {
-              full_name: fullName,
-            }
-          }
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
         });
-
-        if (error) {
-          toast({
-            title: "Error",
-            description: error.message,
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Success",
-            description: "Account created! Please check your email for verification.",
-          });
-          onClose();
-        }
+      } else {
+        toast({
+          title: "Success",
+          description: "Successfully signed in!",
+        });
+        onClose();
       }
     } catch (error) {
       toast({
@@ -222,123 +186,52 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
             </div>
           </form>
         ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-eka-jade-luxury/20 border border-eka-jade-luxury/30">
-              <TabsTrigger 
-                value="login" 
-                className="text-xs sm:text-sm data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth touch-manipulation"
-              >
-                Sign In
-              </TabsTrigger>
-              <TabsTrigger 
-                value="signup"
-                className="text-xs sm:text-sm data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth touch-manipulation"
-              >
-                Sign Up
-              </TabsTrigger>
-            </TabsList>
+          <form onSubmit={handleLogin} className="space-y-4 mt-6">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm text-eka-champagne">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm text-eka-champagne">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
 
-          <TabsContent value="login" className="space-y-4 mt-6">
-            <form onSubmit={handleAuth} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm text-eka-champagne">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm text-eka-champagne">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
-                  placeholder="Enter your password"
-                  required
-                />
-              </div>
-
-              <Button 
-                type="submit" 
-                className="w-full bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth min-h-[44px] touch-manipulation"
-                disabled={isLoading}
+            <Button 
+              type="submit" 
+              className="w-full bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth min-h-[44px] touch-manipulation"
+              disabled={isLoading}
+            >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Sign In
+            </Button>
+            
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => setShowApplication(true)}
+                className="text-sm text-eka-champagne hover:text-eka-golden transition-colors underline"
               >
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Sign In
-              </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="signup" className="space-y-4 mt-6">
-            <form onSubmit={handleAuth} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-sm text-eka-champagne">Full Name</Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
-                  placeholder="Enter your full name"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="signUpEmail" className="text-sm text-eka-champagne">Email</Label>
-                <Input
-                  id="signUpEmail"
-                  type="email"
-                  value={signUpEmail}
-                  onChange={(e) => setSignUpEmail(e.target.value)}
-                  className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="signUpPassword" className="text-sm text-eka-champagne">Password</Label>
-                <Input
-                  id="signUpPassword"
-                  type="password"
-                  value={signUpPassword}
-                  onChange={(e) => setSignUpPassword(e.target.value)}
-                  className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
-                  placeholder="Create a password"
-                  required
-                />
-              </div>
-
-              <Button 
-                type="submit" 
-                className="w-full bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth min-h-[44px] touch-manipulation"
-                disabled={isLoading}
-              >
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create Account
-              </Button>
-              
-              <div className="text-center mt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowApplication(true)}
-                  className="text-sm text-eka-champagne hover:text-eka-golden transition-colors underline"
-                >
-                  Not an eka client yet? Apply here
-                </button>
-              </div>
-            </form>
-          </TabsContent>
-        </Tabs>
+                Not an eka client yet? Apply here
+              </button>
+            </div>
+          </form>
         )}
       </DialogContent>
     </Dialog>
