@@ -33,12 +33,15 @@ const Admin = () => {
 
     checkUser();
     
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event, session ? 'Session exists' : 'No session');
       
       if (session?.user) {
         setUser(session.user);
-        await checkAdminStatus(session.user.id);
+        // Use setTimeout to avoid blocking the auth callback
+        setTimeout(() => {
+          checkAdminStatus(session.user.id);
+        }, 0);
       } else {
         setUser(null);
         setIsAdmin(false);
