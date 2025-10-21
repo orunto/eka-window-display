@@ -10,13 +10,17 @@ interface Profile {
   id: string;
   email: string | null;
   full_name: string | null;
-  role: "admin" | "customer";
   created_at: string;
   updated_at: string;
 }
 
+interface UserRole {
+  role: "admin" | "customer";
+}
+
 export const UsersManager = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [userRoles, setUserRoles] = useState<Record<string, "admin" | "customer">>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -25,20 +29,30 @@ export const UsersManager = () => {
 
   const fetchProfiles = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      
-      // Cast the data to ensure proper typing
-      const typedProfiles: Profile[] = (data || []).map(profile => ({
-        ...profile,
-        role: (profile.role as "admin" | "customer") || "customer"
-      }));
-      
-      setProfiles(typedProfiles);
+      if (profilesError) throw profilesError;
+      setProfiles(profilesData || []);
+
+      // Fetch user roles separately
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) throw rolesError;
+
+      // Create a map of user_id to role (prioritize admin role)
+      const rolesMap: Record<string, "admin" | "customer"> = {};
+      (rolesData || []).forEach((roleEntry: any) => {
+        if (!rolesMap[roleEntry.user_id] || roleEntry.role === 'admin') {
+          rolesMap[roleEntry.user_id] = roleEntry.role;
+        }
+      });
+
+      setUserRoles(rolesMap);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -50,10 +64,16 @@ export const UsersManager = () => {
 
   const updateUserRole = async (userId: string, newRole: "admin" | "customer") => {
     try {
+      // Delete existing roles for this user
+      await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId);
+
+      // Insert new role
       const { error } = await supabase
-        .from('profiles')
-        .update({ role: newRole })
-        .eq('id', userId);
+        .from('user_roles')
+        .insert([{ user_id: userId, role: newRole }]);
 
       if (error) throw error;
 
@@ -91,27 +111,29 @@ export const UsersManager = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-eka-jade-luxury/20">
-              {profiles.map((profile) => (
-                <tr key={profile.id} className="hover:bg-eka-jade-luxury/10">
-                  <td className="px-4 py-3 text-eka-pearl">{profile.email || 'No email'}</td>
-                  <td className="px-4 py-3 text-eka-champagne">{profile.full_name || 'No name'}</td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      profile.role === 'admin' 
-                        ? 'bg-eka-golden/20 text-eka-golden' 
-                        : 'bg-eka-sage-whisper/20 text-eka-champagne'
-                    }`}>
-                      {profile.role}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-eka-champagne">
-                    {new Date(profile.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Select
-                      value={profile.role}
-                      onValueChange={(value: "admin" | "customer") => updateUserRole(profile.id, value)}
-                    >
+              {profiles.map((profile) => {
+                const currentRole = userRoles[profile.id] || 'customer';
+                return (
+                  <tr key={profile.id} className="hover:bg-eka-jade-luxury/10">
+                    <td className="px-4 py-3 text-eka-pearl">{profile.email || 'No email'}</td>
+                    <td className="px-4 py-3 text-eka-champagne">{profile.full_name || 'No name'}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        currentRole === 'admin' 
+                          ? 'bg-eka-golden/20 text-eka-golden' 
+                          : 'bg-eka-sage-whisper/20 text-eka-champagne'
+                      }`}>
+                        {currentRole}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-eka-champagne">
+                      {new Date(profile.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Select
+                        value={currentRole}
+                        onValueChange={(value: "admin" | "customer") => updateUserRole(profile.id, value)}
+                      >
                       <SelectTrigger className="w-32 bg-eka-emerald-depth/20 border-eka-jade-luxury/30 text-eka-pearl">
                         <SelectValue />
                       </SelectTrigger>
@@ -132,7 +154,8 @@ export const UsersManager = () => {
                     </Select>
                   </td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         </div>

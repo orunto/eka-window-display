@@ -8,9 +8,9 @@ import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { useToast } from "@/hooks/use-toast";
 
 const Admin = () => {
-  const [user, setUser] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(true); // Temporarily set to true for testing
-  const [loading, setLoading] = useState(false); // Set to false to skip loading
+  const [user, setUser] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -31,25 +31,20 @@ const Admin = () => {
     };
     loadFonts();
 
-    // Temporarily bypass authentication for testing
-    // Uncomment the code below to restore authentication:
-    
-    // checkUser();
-    // const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-    //   if (session?.user) {
-    //     setUser(session.user);
-    //     await checkAdminStatus(session.user.id);
-    //   } else {
-    //     setUser(null);
-    //     setIsAdmin(false);
-    //   }
-    //   setLoading(false);
-    // });
-    // return () => subscription.unsubscribe();
+    checkUser();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        await checkAdminStatus(session.user.id);
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+      }
+      setLoading(false);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
-  // Commented out for testing - uncomment to restore auth functionality
-  /*
   const checkUser = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -71,23 +66,21 @@ const Admin = () => {
 
   const checkAdminStatus = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single();
+      // Use the is_admin() function to check admin status
+      const { data, error } = await supabase.rpc('is_admin');
 
       if (error) {
         console.error('Error checking admin status:', error);
+        setIsAdmin(false);
         return;
       }
 
-      setIsAdmin(data?.role === 'admin');
+      setIsAdmin(data === true);
     } catch (error) {
       console.error('Error checking admin status:', error);
+      setIsAdmin(false);
     }
   };
-  */
 
   if (loading) {
     return (
@@ -102,7 +95,6 @@ const Admin = () => {
       <EkaHeader />
       
       <div className="container mx-auto px-4 py-20 relative z-10">
-        {/* Temporarily bypass auth check - uncomment below to restore:
         {!user ? (
           <AdminAuth />
         ) : !isAdmin ? (
@@ -115,10 +107,6 @@ const Admin = () => {
         ) : (
           <AdminDashboard />
         )}
-        */}
-        
-        {/* Direct access to admin dashboard for testing */}
-        <AdminDashboard />
       </div>
 
       <EkaFooter />

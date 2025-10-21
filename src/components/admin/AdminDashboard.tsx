@@ -5,6 +5,7 @@ import { ProductsManager } from "./ProductsManager";
 import { CategoriesManager } from "./CategoriesManager";
 import { CollectionsManager } from "./CollectionsManager";
 import { UsersManager } from "./UsersManager";
+import { OrdersManager } from "./OrdersManager";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
@@ -49,8 +50,11 @@ export const AdminDashboard = () => {
       </div>
 
       <div className="bg-gradient-glass backdrop-blur-xl rounded-3xl border border-eka-jade-luxury/30 p-8">
-        <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-eka-emerald-depth/20">
+        <Tabs defaultValue="orders" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5 bg-eka-emerald-depth/20">
+            <TabsTrigger value="orders" className="text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
+              Orders
+            </TabsTrigger>
             <TabsTrigger value="products" className="text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
               Products
             </TabsTrigger>
@@ -64,6 +68,10 @@ export const AdminDashboard = () => {
               Users
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="orders" className="space-y-4">
+            <OrdersManager />
+          </TabsContent>
 
           <TabsContent value="products" className="space-y-4">
             <ProductsManager />
