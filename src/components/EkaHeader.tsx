@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, User, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { LoginModal } from "@/components/LoginModal";
 
 export const EkaHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { user, loading } = useAuth();
@@ -99,10 +101,12 @@ export const EkaHeader = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 text-eka-champagne">
-                    <User className="w-4 h-4" />
-                    <span className="text-sm">Guest</span>
-                  </div>
+                  <Button
+                    onClick={() => setIsLoginModalOpen(true)}
+                    className="bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth text-sm px-4 py-2"
+                  >
+                    Sign In
+                  </Button>
                 )}
               </div>
             )}
@@ -142,9 +146,20 @@ export const EkaHeader = () => {
                           </Button>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2 text-eka-champagne">
-                          <User className="w-4 h-4" />
-                          <span className="text-sm">Guest Access</span>
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-eka-champagne">
+                            <User className="w-4 h-4" />
+                            <span className="text-sm">Guest Access</span>
+                          </div>
+                          <Button
+                            onClick={() => {
+                              setIsLoginModalOpen(true);
+                              setIsMobileMenuOpen(false);
+                            }}
+                            className="w-full bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth min-h-[44px] touch-manipulation"
+                          >
+                            Sign In
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -172,6 +187,11 @@ export const EkaHeader = () => {
           </div>
         </div>
       </div>
+      
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+      />
     </header>
   );
 };

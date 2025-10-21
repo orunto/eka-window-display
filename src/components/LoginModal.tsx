@@ -60,10 +60,13 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
           onClose();
         }
       } else if (activeTab === "signup") {
+        const redirectUrl = `${window.location.origin}/`;
+        
         const { error } = await supabase.auth.signUp({
           email: signUpEmail,
           password: signUpPassword,
           options: {
+            emailRedirectTo: redirectUrl,
             data: {
               full_name: fullName,
             }
