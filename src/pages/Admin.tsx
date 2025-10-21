@@ -32,25 +32,40 @@ const Admin = () => {
     loadFonts();
 
     checkUser();
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session ? 'Session exists' : 'No session');
+      
       if (session?.user) {
         setUser(session.user);
         await checkAdminStatus(session.user.id);
       } else {
         setUser(null);
         setIsAdmin(false);
+        setLoading(false);
       }
-      setLoading(false);
     });
+    
     return () => subscription.unsubscribe();
   }, []);
 
   const checkUser = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      console.log('Checking user session...');
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        throw sessionError;
+      }
+      
+      console.log('Session:', session ? 'Found' : 'Not found');
+      
       if (session?.user) {
         setUser(session.user);
         await checkAdminStatus(session.user.id);
+      } else {
+        setLoading(false);
       }
     } catch (error) {
       console.error('Error checking user:', error);
@@ -59,26 +74,31 @@ const Admin = () => {
         description: "Failed to check authentication status",
         variant: "destructive",
       });
-    } finally {
       setLoading(false);
     }
   };
 
   const checkAdminStatus = async (userId: string) => {
     try {
+      console.log('Checking admin status for user:', userId);
+      
       // Use the is_admin() function to check admin status
       const { data, error } = await supabase.rpc('is_admin');
 
       if (error) {
-        console.error('Error checking admin status:', error);
+        console.error('RPC error checking admin status:', error);
         setIsAdmin(false);
+        setLoading(false);
         return;
       }
 
+      console.log('Admin status result:', data);
       setIsAdmin(data === true);
     } catch (error) {
       console.error('Error checking admin status:', error);
       setIsAdmin(false);
+    } finally {
+      setLoading(false);
     }
   };
 
