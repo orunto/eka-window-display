@@ -41,6 +41,39 @@ export type Database = {
         }
         Relationships: []
       }
+      client_applications: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          notes: string | null
+          phone_number: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone_number: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone_number?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       collections: {
         Row: {
           created_at: string | null
@@ -269,6 +302,7 @@ export type Database = {
           full_name: string | null
           id: string
           role: string | null
+          tier: string | null
           updated_at: string | null
         }
         Insert: {
@@ -277,6 +311,7 @@ export type Database = {
           full_name?: string | null
           id: string
           role?: string | null
+          tier?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -285,6 +320,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           role?: string | null
+          tier?: string | null
           updated_at?: string | null
         }
         Relationships: []

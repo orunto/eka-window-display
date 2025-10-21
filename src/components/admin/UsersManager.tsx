@@ -10,6 +10,7 @@ interface Profile {
   id: string;
   email: string | null;
   full_name: string | null;
+  tier: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -53,6 +54,30 @@ export const UsersManager = () => {
       });
 
       setUserRoles(rolesMap);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const updateUserTier = async (userId: string, tier: string) => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ tier })
+        .eq("id", userId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `User tier updated to ${tier}`,
+      });
+      
+      fetchProfiles();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -106,6 +131,7 @@ export const UsersManager = () => {
                 <th className="px-4 py-3 text-left text-eka-pearl">Email</th>
                 <th className="px-4 py-3 text-left text-eka-pearl">Full Name</th>
                 <th className="px-4 py-3 text-left text-eka-pearl">Role</th>
+                <th className="px-4 py-3 text-left text-eka-pearl">Tier</th>
                 <th className="px-4 py-3 text-left text-eka-pearl">Created</th>
                 <th className="px-4 py-3 text-left text-eka-pearl">Actions</th>
               </tr>
@@ -125,6 +151,21 @@ export const UsersManager = () => {
                       }`}>
                         {currentRole}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Select
+                        value={profile.tier || "C"}
+                        onValueChange={(value) => updateUserTier(profile.id, value)}
+                      >
+                        <SelectTrigger className="w-24 bg-eka-emerald-depth/20 border-eka-jade-luxury/30 text-eka-pearl">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="A">Tier A</SelectItem>
+                          <SelectItem value="B">Tier B</SelectItem>
+                          <SelectItem value="C">Tier C</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </td>
                     <td className="px-4 py-3 text-eka-champagne">
                       {new Date(profile.created_at).toLocaleDateString()}

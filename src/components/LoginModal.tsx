@@ -18,6 +18,7 @@ interface LoginModalProps {
 export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+  const [showApplication, setShowApplication] = useState(false);
   const { toast } = useToast();
 
   // Login form state
@@ -32,8 +33,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   // Client application form state
   const [clientEmail, setClientEmail] = useState("");
   const [clientName, setClientName] = useState("");
-  const [profession, setProfession] = useState("");
-  const [reason, setReason] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,16 +101,37 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const handleClientAppSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
+    try {
+      const { error } = await supabase
+        .from('client_applications')
+        .insert({
+          full_name: clientName,
+          email: clientEmail,
+          phone_number: phoneNumber,
+        });
 
-    // Simulate client application submission
-    setTimeout(() => {
+      if (error) throw error;
+
       toast({
-        title: "Application Submitted",
-        description: "Your client application has been submitted for review. We'll contact you within 2-3 business days.",
+        title: "Application Submitted Successfully! 🎉",
+        description: "We will reach out to you via WhatsApp and messaging to tell you when we've accepted your application.",
       });
-      setIsLoading(false);
+      
+      setClientName("");
+      setClientEmail("");
+      setPhoneNumber("");
+      setShowApplication(false);
       onClose();
-    }, 1000);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -119,43 +140,103 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
         <DialogHeader className="space-y-3">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl sm:text-2xl font-heading text-eka-golden">
-              Access EKA
+              {showApplication ? "Apply as EKA Client" : "Access EKA"}
             </DialogTitle>
             <Button
               variant="ghost"
               size="icon"
-              onClick={onClose}
+              onClick={() => {
+                setShowApplication(false);
+                onClose();
+              }}
               className="text-eka-pearl hover:bg-eka-jade-luxury/20 min-h-[40px] min-w-[40px] touch-manipulation"
             >
               <X className="h-4 w-4" />
             </Button>
           </div>
           <p className="text-sm sm:text-base text-eka-champagne leading-relaxed">
-            Sign in to access exclusive collections and purchase luxury pieces.
+            {showApplication 
+              ? "Complete the application form to become an EKA client."
+              : "Sign in to access exclusive collections and purchase luxury pieces."}
           </p>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-eka-jade-luxury/20 border border-eka-jade-luxury/30">
-            <TabsTrigger 
-              value="login" 
-              className="text-xs sm:text-sm data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth touch-manipulation"
-            >
-              Sign In
-            </TabsTrigger>
-            <TabsTrigger 
-              value="signup"
-              className="text-xs sm:text-sm data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth touch-manipulation"
-            >
-              Sign Up
-            </TabsTrigger>
-            <TabsTrigger 
-              value="client"
-              className="text-xs sm:text-sm data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth touch-manipulation"
-            >
-              Apply
-            </TabsTrigger>
-          </TabsList>
+        {showApplication ? (
+          <form onSubmit={handleClientAppSubmit} className="space-y-4 mt-6">
+            <div className="space-y-2">
+              <Label htmlFor="clientName" className="text-sm text-eka-champagne">Full Name</Label>
+              <Input
+                id="clientName"
+                type="text"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
+                placeholder="Enter your full name"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="clientEmail" className="text-sm text-eka-champagne">Email</Label>
+              <Input
+                id="clientEmail"
+                type="email"
+                value={clientEmail}
+                onChange={(e) => setClientEmail(e.target.value)}
+                className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber" className="text-sm text-eka-champagne">Phone Number</Label>
+              <Input
+                id="phoneNumber"
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
+                placeholder="+234 XXX XXX XXXX"
+                required
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button 
+                type="button"
+                onClick={() => setShowApplication(false)}
+                variant="outline"
+                className="flex-1 border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20 min-h-[44px] touch-manipulation"
+              >
+                Back
+              </Button>
+              <Button 
+                type="submit" 
+                className="flex-1 bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth min-h-[44px] touch-manipulation"
+                disabled={isLoading}
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Submit Application
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-eka-jade-luxury/20 border border-eka-jade-luxury/30">
+              <TabsTrigger 
+                value="login" 
+                className="text-xs sm:text-sm data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth touch-manipulation"
+              >
+                Sign In
+              </TabsTrigger>
+              <TabsTrigger 
+                value="signup"
+                className="text-xs sm:text-sm data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth touch-manipulation"
+              >
+                Sign Up
+              </TabsTrigger>
+            </TabsList>
 
           <TabsContent value="login" className="space-y-4 mt-6">
             <form onSubmit={handleAuth} className="space-y-4">
@@ -245,73 +326,20 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create Account
               </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="client" className="space-y-4 mt-6">
-            <form onSubmit={handleClientAppSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="clientName" className="text-sm text-eka-champagne">Full Name</Label>
-                <Input
-                  id="clientName"
-                  type="text"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
-                  placeholder="Enter your full name"
-                  required
-                />
-              </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="clientEmail" className="text-sm text-eka-champagne">Email</Label>
-                <Input
-                  id="clientEmail"
-                  type="email"
-                  value={clientEmail}
-                  onChange={(e) => setClientEmail(e.target.value)}
-                  className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
-                  placeholder="Enter your email"
-                  required
-                />
+              <div className="text-center mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowApplication(true)}
+                  className="text-sm text-eka-champagne hover:text-eka-golden transition-colors underline"
+                >
+                  Not an eka client yet? Apply here
+                </button>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="profession" className="text-sm text-eka-champagne">Profession</Label>
-                <Input
-                  id="profession"
-                  type="text"
-                  value={profession}
-                  onChange={(e) => setProfession(e.target.value)}
-                  className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
-                  placeholder="Your profession"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="reason" className="text-sm text-eka-champagne">Why do you want to become a client?</Label>
-                <Textarea
-                  id="reason"
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[88px] resize-none"
-                  placeholder="Tell us about your interest in EKA..."
-                  required
-                />
-              </div>
-
-              <Button 
-                type="submit" 
-                className="w-full bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth min-h-[44px] touch-manipulation"
-                disabled={isLoading}
-              >
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Submit Application
-              </Button>
             </form>
           </TabsContent>
         </Tabs>
+        )}
       </DialogContent>
     </Dialog>
   );
