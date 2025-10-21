@@ -2,16 +2,10 @@
 import { EkaHeader } from "@/components/EkaHeader";
 import { ProductCard } from "@/components/ProductCard";
 import { EkaFooter } from "@/components/EkaFooter";
-import { mockProducts } from "@/data/mockData";
-import { useAuth } from "@/contexts/AuthContext";
+import { useProducts } from "@/hooks/useProducts";
 
 const Index = () => {
-  const { user } = useAuth();
-  
-  // Show featured products and tier C products if user is logged in
-  const featuredProducts = user 
-    ? mockProducts.filter(product => product.tier === "A" || product.tier === "C").slice(0, 8)
-    : mockProducts.filter(product => product.tier === "A").slice(0, 6);
+  const { products, loading } = useProducts({ featured: true });
 
   return (
     <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
@@ -39,15 +33,32 @@ const Index = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProducts.map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product}
-                onClick={() => console.log(`Viewing product: ${product.name}`)}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center text-eka-champagne py-20">
+              <p className="text-xl">Loading products...</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="text-center text-eka-champagne py-20">
+              <p className="text-xl">No products available at the moment.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {products.map((product) => (
+                <ProductCard 
+                  key={product.id} 
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    image: product.image_url || '',
+                    price: product.price || undefined,
+                    description: product.description || '',
+                    category: 'Featured',
+                    tier: (product.tier as "A" | "B" | "C") || "A"
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

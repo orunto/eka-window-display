@@ -1,6 +1,6 @@
 import { EkaHeader } from "@/components/EkaHeader";
 import { EkaFooter } from "@/components/EkaFooter";
-import { mockCollections } from "@/data/mockData";
+import { useCollections } from "@/hooks/useCollections";
 import { Badge } from "@/components/ui/badge";
 import { Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const Collections = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { collections, loading } = useCollections();
 
   useEffect(() => {
     // Load fonts
@@ -57,8 +58,17 @@ const Collections = () => {
       </div>
 
       <div className="container mx-auto px-4 pb-20 relative">
-        <div className="space-y-40">
-          {mockCollections.map((collection, index) => (
+        {loading ? (
+          <div className="text-center text-eka-champagne py-20">
+            <p className="text-xl">Loading collections...</p>
+          </div>
+        ) : collections.length === 0 ? (
+          <div className="text-center text-eka-champagne py-20">
+            <p className="text-xl">No collections available at the moment.</p>
+          </div>
+        ) : (
+          <div className="space-y-40">
+            {collections.map((collection, index) => (
             <div key={collection.id}>
               {/* Visual Section Divider */}
               {index > 0 && (
@@ -88,22 +98,9 @@ const Collections = () => {
                         <h2 className="text-5xl md:text-6xl font-heading font-normal bg-gradient-to-r from-eka-pearl to-eka-champagne bg-clip-text text-transparent group-hover:from-eka-golden group-hover:to-eka-pearl transition-all duration-700">
                           {collection.name}
                         </h2>
-                        {collection.tier === "A" && (
-                          <Badge className="bg-eka-golden text-eka-emerald-depth border-0 px-6 py-3 font-medium text-base">
-                            Full Access
-                          </Badge>
-                        )}
-                        {collection.tier === "B" && (
-                          <Badge variant="outline" className="border-eka-champagne text-eka-champagne bg-gradient-glass px-6 py-3 text-base backdrop-blur-sm">
-                            Collaboration
-                          </Badge>
-                        )}
-                        {collection.tier === "C" && (
-                          <Badge className="bg-gradient-to-r from-eka-jade-luxury to-eka-emerald-depth text-eka-pearl border-0 px-6 py-3 text-base">
-                            <Lock className="w-4 h-4 mr-2" />
-                            Heritage
-                          </Badge>
-                        )}
+                        <Badge className="bg-eka-golden text-eka-emerald-depth border-0 px-6 py-3 font-medium text-base">
+                          Exclusive
+                        </Badge>
                       </div>
                       
                       <p className="text-lg text-eka-golden font-medium uppercase tracking-[0.3em] opacity-90">
@@ -120,19 +117,11 @@ const Collections = () => {
                         }
                       </p>
                       
-                      {collection.story && (
-                        <div className="border-l-4 border-eka-golden pl-8">
-                          <p className="text-eka-champagne italic leading-relaxed text-lg">
-                            {collection.story}
-                          </p>
-                        </div>
-                      )}
-                      
                       <div className="flex items-center justify-between pt-6 border-t border-eka-jade-luxury/30">
                         <div className="flex items-center space-x-4">
                           <div className="w-2 h-2 bg-eka-golden rounded-full animate-pulse" />
                           <p className="text-eka-champagne font-medium">
-                            {collection.productCount} exclusive pieces
+                            Exclusive collection
                           </p>
                         </div>
                         <div className="w-12 h-12 rounded-full bg-gradient-accent opacity-70 group-hover:opacity-100 transition-all duration-700 flex items-center justify-center animate-float">
@@ -142,82 +131,45 @@ const Collections = () => {
                     </div>
 
                     {/* Collection Features */}
-                    {collection.tier === "A" && (
-                      <div className="bg-gradient-to-br from-eka-golden/10 to-eka-champagne/5 border border-eka-golden/30 rounded-2xl p-8 space-y-6 backdrop-blur-sm">
-                        <h3 className="text-2xl font-semibold text-eka-golden">
-                          Collection Features
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {['Heritage craftsmanship', 'Sustainable luxury', 'Limited production', 'Custom tailoring'].map((feature, i) => (
+                    <div className="bg-gradient-to-br from-eka-golden/10 to-eka-champagne/5 border border-eka-golden/30 rounded-2xl p-8 space-y-6 backdrop-blur-sm">
+                      <h3 className="text-2xl font-semibold text-eka-golden">
+                        {!user ? "Sign in to view exclusive collections" : "Collection Features"}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {!user ? (
+                          <>
+                            <div className="flex items-center gap-3">
+                              <div className="w-3 h-3 bg-eka-golden rounded-full animate-pulse" />
+                              <span className="text-eka-pearl">Heritage craftsmanship</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <div className="w-3 h-3 bg-eka-golden rounded-full animate-pulse animation-delay-200" />
+                              <span className="text-eka-pearl">Sustainable luxury</span>
+                            </div>
+                          </>
+                        ) : (
+                          ['Heritage craftsmanship', 'Sustainable luxury', 'Limited production', 'Custom tailoring'].map((feature, i) => (
                             <div key={i} className="flex items-center gap-3">
                               <div className="w-3 h-3 bg-eka-golden rounded-full animate-pulse" style={{animationDelay: `${i * 200}ms`}} />
                               <span className="text-eka-pearl">{feature}</span>
                             </div>
-                          ))}
-                        </div>
+                          ))
+                        )}
                       </div>
-                    )}
-
-                    {collection.tier === "C" && !user && (
-                      <div className="bg-gradient-to-br from-eka-emerald-depth/80 to-eka-jade-luxury/40 border border-eka-golden/30 rounded-2xl p-8 space-y-6 backdrop-blur-sm">
-                        <h3 className="text-2xl font-semibold text-eka-golden">
-                          Exclusive Heritage Access
-                        </h3>
-                        <p className="text-eka-champagne leading-relaxed text-lg">
-                          This collection represents the pinnacle of Eka's artistry and vision. 
-                          Access is reserved for founding clients who understand true luxury.
-                        </p>
-                        <div className="inline-flex items-center gap-3 text-eka-golden font-medium">
-                          <Lock className="w-5 h-5" />
-                          <span>Heritage membership required</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {collection.tier === "C" && user && (
-                      <div className="bg-gradient-to-br from-eka-golden/10 to-eka-champagne/5 border border-eka-golden/30 rounded-2xl p-8 space-y-6 backdrop-blur-sm">
-                        <h3 className="text-2xl font-semibold text-eka-golden">
-                          Heritage Collection - Full Access
-                        </h3>
-                        <p className="text-eka-champagne leading-relaxed text-lg">
-                          Welcome to our most exclusive collection. Each piece represents the pinnacle of 
-                          Eka's artistry, crafted with generations of wisdom and the finest materials.
-                        </p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {['Master craftsmanship', 'Rare materials', 'One-of-a-kind pieces', 'Heritage storytelling'].map((feature, i) => (
-                            <div key={i} className="flex items-center gap-3">
-                              <div className="w-3 h-3 bg-eka-golden rounded-full animate-pulse" style={{animationDelay: `${i * 200}ms`}} />
-                              <span className="text-eka-pearl">{feature}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    </div>
                   </div>
 
                   {/* Collection Image */}
                   <div className={`relative ${index % 2 === 1 ? 'lg:col-start-1' : ''}`}>
                     <div className="relative group/image">
-                      <div className={`aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 group-hover:shadow-glow ${collection.tier === "C" && !user ? "blur-[1px]" : ""} relative`}>
+                      <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 group-hover:shadow-glow relative">
                         <img 
-                          src={collection.image} 
+                          src={collection.image_url || 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=800&fit=crop'}
                           alt={collection.name}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-eka-emerald-depth/30 via-transparent to-transparent" />
                       </div>
-                      
-                      {collection.tier === "C" && !user && (
-                        <div className="absolute inset-0 bg-gradient-to-br from-eka-emerald-depth/40 to-eka-jade-luxury/60 flex items-center justify-center rounded-3xl backdrop-blur-[2px]">
-                          <div className="text-center text-eka-pearl space-y-6 bg-eka-emerald-depth/60 backdrop-blur-xl rounded-2xl p-10 border border-eka-golden/30">
-                            <Lock className="w-20 h-20 mx-auto text-eka-golden" />
-                            <div className="space-y-2">
-                              <p className="text-2xl font-medium">Heritage Access</p>
-                              <p className="text-eka-champagne">Sign in to view</p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
                       
                       {/* Decorative elements */}
                       <div className="absolute -top-4 -right-4 w-12 h-12 bg-gradient-accent rounded-full opacity-70 group-hover:opacity-100 transition-all duration-700 animate-float" />
@@ -227,8 +179,9 @@ const Collections = () => {
                 </div>
               </section>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Footer - keeping the existing footer component */}
