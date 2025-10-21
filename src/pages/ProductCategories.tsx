@@ -4,9 +4,12 @@ import { EkaFooter } from "@/components/EkaFooter";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { ArrowRight } from "lucide-react";
+import { useCategories } from "@/hooks/useCategories";
+import { supabase } from "@/integrations/supabase/client";
 
 const ProductCategories = () => {
   const navigate = useNavigate();
+  const { categories, loading } = useCategories();
 
   useEffect(() => {
     // Scroll to top when component mounts
@@ -26,33 +29,14 @@ const ProductCategories = () => {
     };
     loadFonts();
   }, []);
-  
-  const categories = [
-    {
-      name: "Tops",
-      description: "Sophisticated blouses, blazers, and statement pieces designed for the modern professional.",
-      image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500&h=600&fit=crop",
-      count: "12 Pieces"
-    },
-    {
-      name: "Bottoms", 
-      description: "Tailored trousers, elegant skirts, and contemporary silhouettes for every occasion.",
-      image: "https://images.unsplash.com/photo-1551803091-e20673f15770?w=500&h=600&fit=crop",
-      count: "8 Pieces"
-    },
-    {
-      name: "Ensembles",
-      description: "Complete coordinated sets and statement dresses that embody Afromodern elegance.",
-      image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=500&h=600&fit=crop",
-      count: "15 Pieces"
-    },
-    {
-      name: "Accessories",
-      description: "Luxury jewelry, handbags, and finishing touches that complete your distinctive look.",
-      image: "https://images.unsplash.com/photo-1506629905607-45848be1e3b7?w=500&h=600&fit=crop",
-      count: "24 Pieces"
-    }
-  ];
+
+  const getProductCount = async (categoryId: string) => {
+    const { count } = await supabase
+      .from('products')
+      .select('*', { count: 'exact', head: true })
+      .eq('category_id', categoryId);
+    return count || 0;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
@@ -79,38 +63,47 @@ const ProductCategories = () => {
         </div>
 
         {/* Category Cards */}
-        <div className="grid md:grid-cols-2 gap-8">
-          {categories.map((category, index) => (
-            <div 
-              key={category.name}
-              onClick={() => navigate(`/category/${category.name.toLowerCase()}`)}
-              className="group relative bg-gradient-glass backdrop-blur-md rounded-3xl overflow-hidden shadow-lg hover:shadow-glow transition-all duration-500 cursor-pointer border border-eka-jade-luxury/30 hover:border-eka-golden/50"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <div className="relative aspect-[5/4] overflow-hidden">
-                <img 
-                  src={category.image} 
-                  alt={category.name}
+        {loading ? (
+          <div className="text-center text-eka-champagne py-20">
+            <p className="text-xl">Loading categories...</p>
+          </div>
+        ) : categories.length === 0 ? (
+          <div className="text-center text-eka-champagne py-20">
+            <p className="text-xl">No categories available yet.</p>
+            <p className="text-sm mt-2">Categories will appear here once added by an administrator.</p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-8">
+            {categories.map((category, index) => (
+              <div 
+                key={category.id}
+                onClick={() => navigate(`/category/${category.id}`)}
+                className="group relative bg-gradient-glass backdrop-blur-md rounded-3xl overflow-hidden shadow-lg hover:shadow-glow transition-all duration-500 cursor-pointer border border-eka-jade-luxury/30 hover:border-eka-golden/50"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="relative aspect-[5/4] overflow-hidden">
+                  <img 
+                    src={category.image_url || 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500&h=600&fit=crop'} 
+                    alt={category.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 
                 {/* Elegant gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-br from-eka-emerald-depth/20 via-eka-emerald-depth/40 to-eka-emerald-depth/80" />
                 
-                {/* Content overlay */}
-                <div className="absolute inset-0 flex flex-col justify-end p-8">
-                  <div className="bg-gradient-glass backdrop-blur-md rounded-2xl p-6 border border-eka-pearl/20">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-3xl font-heading text-eka-pearl group-hover:text-eka-golden transition-colors duration-300">
-                        {category.name}
-                      </h3>
-                      <div className="flex items-center space-x-2 text-eka-champagne">
-                        <span className="text-sm font-medium">{category.count}</span>
-                        <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" />
+                  {/* Content overlay */}
+                  <div className="absolute inset-0 flex flex-col justify-end p-8">
+                    <div className="bg-gradient-glass backdrop-blur-md rounded-2xl p-6 border border-eka-pearl/20">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-3xl font-heading text-eka-pearl group-hover:text-eka-golden transition-colors duration-300">
+                          {category.name}
+                        </h3>
+                        <div className="flex items-center space-x-2 text-eka-champagne">
+                          <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" />
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-eka-pearl/90 text-sm leading-relaxed mb-4">
-                      {category.description}
+                      <p className="text-eka-pearl/90 text-sm leading-relaxed mb-4">
+                        {category.description || "Explore this category"}
                     </p>
                     <div className="flex items-center justify-between">
                       <div className="w-12 h-1 bg-gradient-accent rounded-full group-hover:w-20 transition-all duration-500" />
@@ -118,12 +111,13 @@ const ProductCategories = () => {
                         Explore Collection
                       </span>
                     </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <EkaFooter />

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 
 interface Product {
   id: string;
@@ -331,12 +332,11 @@ export const ProductsManager = () => {
             </div>
 
             <div>
-              <Label htmlFor="image_url" className="text-eka-pearl">Image URL</Label>
-              <Input
-                id="image_url"
-                value={formData.image_url}
-                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                className="bg-eka-emerald-depth/20 border-eka-jade-luxury/30 text-eka-pearl"
+              <Label className="text-eka-pearl">Product Image</Label>
+              <ImageUpload
+                bucket="product-images"
+                currentImage={formData.image_url}
+                onUploadComplete={(url) => setFormData({ ...formData, image_url: url })}
               />
             </div>
 

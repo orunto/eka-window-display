@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 
 interface Category {
   id: string;
@@ -179,13 +180,11 @@ export const CategoriesManager = () => {
               </div>
 
               <div>
-                <Label htmlFor="image_url">Image URL</Label>
-                <Input
-                  id="image_url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                  placeholder="https://example.com/image.jpg"
-                  className="bg-eka-emerald-depth/20 border-eka-jade-luxury/30"
+                <Label>Category Image</Label>
+                <ImageUpload
+                  bucket="product-images"
+                  currentImage={formData.image_url}
+                  onUploadComplete={(url) => setFormData({...formData, image_url: url})}
                 />
               </div>
 
