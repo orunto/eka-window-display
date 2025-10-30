@@ -35,10 +35,10 @@ export const AdminDashboard = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div className="text-center">
-          <h1 className="text-5xl font-heading text-eka-pearl mb-4">Admin Dashboard</h1>
-          <p className="text-xl text-eka-champagne">Manage your Eka store data</p>
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="text-center sm:text-left">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading text-eka-pearl mb-2">Admin Dashboard</h1>
+          <p className="text-base sm:text-lg lg:text-xl text-eka-champagne">Manage your Eka store data</p>
         </div>
         <Button
           onClick={handleSignOut}
@@ -50,25 +50,25 @@ export const AdminDashboard = () => {
         </Button>
       </div>
 
-      <div className="bg-gradient-glass backdrop-blur-xl rounded-3xl border border-eka-jade-luxury/30 p-8">
+      <div className="bg-gradient-glass backdrop-blur-xl rounded-3xl border border-eka-jade-luxury/30 p-4 sm:p-6 lg:p-8">
         <Tabs defaultValue="applications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-eka-emerald-depth/20">
-            <TabsTrigger value="applications" className="text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 bg-eka-emerald-depth/20 h-auto gap-1">
+            <TabsTrigger value="applications" className="text-xs sm:text-sm text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
               Applications
             </TabsTrigger>
-            <TabsTrigger value="orders" className="text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
+            <TabsTrigger value="orders" className="text-xs sm:text-sm text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
               Orders
             </TabsTrigger>
-            <TabsTrigger value="products" className="text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
+            <TabsTrigger value="products" className="text-xs sm:text-sm text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
               Products
             </TabsTrigger>
-            <TabsTrigger value="categories" className="text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
+            <TabsTrigger value="categories" className="text-xs sm:text-sm text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
               Categories
             </TabsTrigger>
-            <TabsTrigger value="collections" className="text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
+            <TabsTrigger value="collections" className="text-xs sm:text-sm text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
               Collections
             </TabsTrigger>
-            <TabsTrigger value="users" className="text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
+            <TabsTrigger value="users" className="text-xs sm:text-sm text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
               Users
             </TabsTrigger>
           </TabsList>

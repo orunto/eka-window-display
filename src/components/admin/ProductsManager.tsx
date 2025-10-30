@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { MultiImageUpload } from "@/components/admin/MultiImageUpload";
+import { ProductVariantsManager } from "@/components/admin/ProductVariantsManager";
 
 interface Product {
   id: string;
@@ -52,7 +54,7 @@ export const ProductsManager = () => {
     collection_id: "",
     tier: "B" as "A" | "B" | "C",
     image_url: "",
-    gallery_images: "",
+    gallery_images: [] as string[],
     in_stock: true,
     featured: false,
   });
@@ -138,7 +140,7 @@ export const ProductsManager = () => {
       collection_id: "",
       tier: "B",
       image_url: "",
-      gallery_images: "",
+      gallery_images: [],
       in_stock: true,
       featured: false,
     });
@@ -158,7 +160,7 @@ export const ProductsManager = () => {
         collection_id: formData.collection_id || null,
         tier: formData.tier,
         image_url: formData.image_url || null,
-        gallery_images: formData.gallery_images ? formData.gallery_images.split(',').map(s => s.trim()).filter(Boolean) : null,
+        gallery_images: formData.gallery_images.length > 0 ? formData.gallery_images : null,
         in_stock: formData.in_stock,
         featured: formData.featured,
       };
@@ -209,7 +211,7 @@ export const ProductsManager = () => {
       collection_id: product.collection_id || "",
       tier: product.tier,
       image_url: product.image_url || "",
-      gallery_images: product.gallery_images?.join(', ') || "",
+      gallery_images: product.gallery_images || [],
       in_stock: product.in_stock,
       featured: product.featured,
     });
@@ -351,15 +353,19 @@ export const ProductsManager = () => {
             </div>
 
             <div className="md:col-span-2">
-              <Label htmlFor="gallery_images" className="text-eka-pearl">Gallery Images (comma-separated URLs)</Label>
-              <Input
-                id="gallery_images"
-                value={formData.gallery_images}
-                onChange={(e) => setFormData({ ...formData, gallery_images: e.target.value })}
-                placeholder="url1, url2, url3"
-                className="bg-eka-emerald-depth/20 border-eka-jade-luxury/30 text-eka-pearl"
+              <Label className="text-eka-pearl">Gallery Images</Label>
+              <MultiImageUpload
+                bucket="product-images"
+                currentImages={formData.gallery_images}
+                onImagesChange={(urls) => setFormData({ ...formData, gallery_images: urls })}
               />
             </div>
+
+            {editingProduct && (
+              <div className="md:col-span-2">
+                <ProductVariantsManager productId={editingProduct.id} />
+              </div>
+            )}
 
             <div className="flex items-center space-x-4">
               <label className="flex items-center space-x-2 text-eka-pearl">
