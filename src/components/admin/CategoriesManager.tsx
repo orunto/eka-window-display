@@ -10,6 +10,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { z } from "zod";
+
+const categorySchema = z.object({
+  name: z.string().min(1, "Name is required").max(200, "Name must be less than 200 characters"),
+  description: z.string().max(2000, "Description must be less than 2000 characters").optional(),
+});
 
 interface Category {
   id: string;
@@ -59,10 +65,35 @@ export const CategoriesManager = () => {
     setLoading(true);
 
     try {
+      // Validate input data
+      const validationData = {
+        name: formData.name.trim(),
+        description: formData.description.trim() || undefined,
+      };
+
+      const validationResult = categorySchema.safeParse(validationData);
+      
+      if (!validationResult.success) {
+        const errors = validationResult.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
+        toast({
+          title: "Validation Error",
+          description: errors,
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      const categoryData = {
+        name: validationData.name,
+        description: validationData.description || '',
+        image_url: formData.image_url,
+      };
+
       if (editingCategory) {
         const { error } = await supabase
           .from('categories')
-          .update(formData)
+          .update(categoryData)
           .eq('id', editingCategory.id);
 
         if (error) throw error;
@@ -73,7 +104,7 @@ export const CategoriesManager = () => {
       } else {
         const { error } = await supabase
           .from('categories')
-          .insert([formData]);
+          .insert([categoryData]);
 
         if (error) throw error;
         toast({

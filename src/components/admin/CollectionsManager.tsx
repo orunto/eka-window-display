@@ -10,6 +10,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { z } from "zod";
+
+const collectionSchema = z.object({
+  name: z.string().min(1, "Name is required").max(200, "Name must be less than 200 characters"),
+  description: z.string().max(2000, "Description must be less than 2000 characters").optional(),
+});
 
 interface Collection {
   id: string;
@@ -61,10 +67,36 @@ export const CollectionsManager = () => {
     setLoading(true);
 
     try {
+      // Validate input data
+      const validationData = {
+        name: formData.name.trim(),
+        description: formData.description.trim() || undefined,
+      };
+
+      const validationResult = collectionSchema.safeParse(validationData);
+      
+      if (!validationResult.success) {
+        const errors = validationResult.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
+        toast({
+          title: "Validation Error",
+          description: errors,
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      const collectionData = {
+        name: validationData.name,
+        description: validationData.description || '',
+        image_url: formData.image_url,
+        featured: formData.featured,
+      };
+
       if (editingCollection) {
         const { error } = await supabase
           .from('collections')
-          .update(formData)
+          .update(collectionData)
           .eq('id', editingCollection.id);
 
         if (error) throw error;
@@ -75,7 +107,7 @@ export const CollectionsManager = () => {
       } else {
         const { error } = await supabase
           .from('collections')
-          .insert([formData]);
+          .insert([collectionData]);
 
         if (error) throw error;
         toast({

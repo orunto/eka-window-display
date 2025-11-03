@@ -11,6 +11,15 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { MultiImageUpload } from "@/components/admin/MultiImageUpload";
 import { ProductVariantsManager } from "@/components/admin/ProductVariantsManager";
+import { z } from "zod";
+
+const productSchema = z.object({
+  name: z.string().min(1, "Name is required").max(200, "Name must be less than 200 characters"),
+  description: z.string().max(2000, "Description must be less than 2000 characters").optional(),
+  price: z.number().positive("Price must be positive").max(999999, "Price must be less than 1,000,000").optional(),
+  tier: z.enum(['A', 'B', 'C'], { required_error: "Tier must be A, B, or C" }),
+  gallery_images: z.array(z.string().url("Invalid image URL")).optional(),
+});
 
 interface Product {
   id: string;
@@ -152,10 +161,31 @@ export const ProductsManager = () => {
     e.preventDefault();
     
     try {
+      // Validate input data
+      const validationData = {
+        name: formData.name.trim(),
+        description: formData.description.trim() || undefined,
+        price: formData.price ? parseFloat(formData.price) : undefined,
+        tier: formData.tier,
+        gallery_images: formData.gallery_images.length > 0 ? formData.gallery_images : undefined,
+      };
+
+      const validationResult = productSchema.safeParse(validationData);
+      
+      if (!validationResult.success) {
+        const errors = validationResult.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
+        toast({
+          title: "Validation Error",
+          description: errors,
+          variant: "destructive",
+        });
+        return;
+      }
+
       const productData = {
-        name: formData.name,
-        description: formData.description || null,
-        price: formData.price ? parseFloat(formData.price) : null,
+        name: validationData.name,
+        description: validationData.description || null,
+        price: validationData.price || null,
         category_id: formData.category_id || null,
         collection_id: formData.collection_id || null,
         tier: formData.tier,
