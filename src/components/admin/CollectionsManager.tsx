@@ -247,37 +247,106 @@ export const CollectionsManager = () => {
         </Dialog>
       </div>
 
-      <div className="bg-eka-emerald-depth/20 rounded-xl overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-eka-jade-luxury/30">
-              <TableHead className="text-eka-champagne">Name</TableHead>
-              <TableHead className="text-eka-champagne">Description</TableHead>
-              <TableHead className="text-eka-champagne">Image</TableHead>
-              <TableHead className="text-eka-champagne">Featured</TableHead>
-              <TableHead className="text-eka-champagne">Created</TableHead>
-              <TableHead className="text-eka-champagne">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+      {collections.length === 0 ? (
+        <div className="bg-eka-emerald-depth/20 backdrop-blur-sm rounded-lg border border-eka-jade-luxury/30 p-12 text-center">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <Plus className="w-16 h-16 text-eka-jade-luxury/40" />
+            <h3 className="text-xl font-heading text-eka-pearl">No collections yet</h3>
+            <p className="text-eka-champagne">Get started by adding your first collection</p>
+            <Button
+              onClick={() => {
+                resetForm();
+                setDialogOpen(true);
+              }}
+              className="bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Your First Collection
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Desktop Table View */}
+          <div className="hidden md:block bg-eka-emerald-depth/20 rounded-xl overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-eka-jade-luxury/30">
+                  <TableHead className="text-eka-champagne">Name</TableHead>
+                  <TableHead className="text-eka-champagne">Description</TableHead>
+                  <TableHead className="text-eka-champagne">Image</TableHead>
+                  <TableHead className="text-eka-champagne">Featured</TableHead>
+                  <TableHead className="text-eka-champagne">Created</TableHead>
+                  <TableHead className="text-eka-champagne">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {collections.map((collection) => (
+                  <TableRow key={collection.id} className="border-eka-jade-luxury/20">
+                    <TableCell className="text-eka-pearl font-medium">{collection.name}</TableCell>
+                    <TableCell className="text-eka-pearl">{collection.description || 'N/A'}</TableCell>
+                    <TableCell className="text-eka-pearl">
+                      {collection.image_url ? (
+                        <img src={collection.image_url} alt={collection.name} className="w-12 h-12 object-cover rounded" />
+                      ) : (
+                        'No image'
+                      )}
+                    </TableCell>
+                    <TableCell className="text-eka-pearl">
+                      {collection.featured ? 'Yes' : 'No'}
+                    </TableCell>
+                    <TableCell className="text-eka-pearl">
+                      {new Date(collection.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(collection)}
+                          className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDelete(collection.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-4">
             {collections.map((collection) => (
-              <TableRow key={collection.id} className="border-eka-jade-luxury/20">
-                <TableCell className="text-eka-pearl font-medium">{collection.name}</TableCell>
-                <TableCell className="text-eka-pearl">{collection.description || 'N/A'}</TableCell>
-                <TableCell className="text-eka-pearl">
-                  {collection.image_url ? (
-                    <img src={collection.image_url} alt={collection.name} className="w-12 h-12 object-cover rounded" />
-                  ) : (
-                    'No image'
+              <div key={collection.id} className="bg-eka-emerald-depth/20 backdrop-blur-sm rounded-lg border border-eka-jade-luxury/30 p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-lg font-heading text-eka-pearl">{collection.name}</h3>
+                      {collection.featured && (
+                        <span className="text-xs px-2 py-1 rounded bg-eka-golden/20 text-eka-golden">
+                          Featured
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-eka-champagne line-clamp-2">{collection.description || 'No description'}</p>
+                  </div>
+                  {collection.image_url && (
+                    <img src={collection.image_url} alt={collection.name} className="w-16 h-16 object-cover rounded ml-3" />
                   )}
-                </TableCell>
-                <TableCell className="text-eka-pearl">
-                  {collection.featured ? 'Yes' : 'No'}
-                </TableCell>
-                <TableCell className="text-eka-pearl">
-                  {new Date(collection.created_at).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
+                </div>
+                <div className="flex justify-between items-center pt-3 border-t border-eka-jade-luxury/20">
+                  <span className="text-xs text-eka-champagne">
+                    {new Date(collection.created_at).toLocaleDateString()}
+                  </span>
                   <div className="flex space-x-2">
                     <Button
                       variant="outline"
@@ -295,12 +364,12 @@ export const CollectionsManager = () => {
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
-                </TableCell>
-              </TableRow>
+                </div>
+              </div>
             ))}
-          </TableBody>
-        </Table>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

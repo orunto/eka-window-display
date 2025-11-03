@@ -231,33 +231,95 @@ export const CategoriesManager = () => {
         </Dialog>
       </div>
 
-      <div className="bg-eka-emerald-depth/20 rounded-xl overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-eka-jade-luxury/30">
-              <TableHead className="text-eka-champagne">Name</TableHead>
-              <TableHead className="text-eka-champagne">Description</TableHead>
-              <TableHead className="text-eka-champagne">Image</TableHead>
-              <TableHead className="text-eka-champagne">Created</TableHead>
-              <TableHead className="text-eka-champagne">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+      {categories.length === 0 ? (
+        <div className="bg-eka-emerald-depth/20 backdrop-blur-sm rounded-lg border border-eka-jade-luxury/30 p-12 text-center">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <Plus className="w-16 h-16 text-eka-jade-luxury/40" />
+            <h3 className="text-xl font-heading text-eka-pearl">No categories yet</h3>
+            <p className="text-eka-champagne">Get started by adding your first category</p>
+            <Button
+              onClick={() => {
+                resetForm();
+                setDialogOpen(true);
+              }}
+              className="bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Your First Category
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Desktop Table View */}
+          <div className="hidden md:block bg-eka-emerald-depth/20 rounded-xl overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-eka-jade-luxury/30">
+                  <TableHead className="text-eka-champagne">Name</TableHead>
+                  <TableHead className="text-eka-champagne">Description</TableHead>
+                  <TableHead className="text-eka-champagne">Image</TableHead>
+                  <TableHead className="text-eka-champagne">Created</TableHead>
+                  <TableHead className="text-eka-champagne">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {categories.map((category) => (
+                  <TableRow key={category.id} className="border-eka-jade-luxury/20">
+                    <TableCell className="text-eka-pearl font-medium">{category.name}</TableCell>
+                    <TableCell className="text-eka-pearl">{category.description || 'N/A'}</TableCell>
+                    <TableCell className="text-eka-pearl">
+                      {category.image_url ? (
+                        <img src={category.image_url} alt={category.name} className="w-12 h-12 object-cover rounded" />
+                      ) : (
+                        'No image'
+                      )}
+                    </TableCell>
+                    <TableCell className="text-eka-pearl">
+                      {new Date(category.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(category)}
+                          className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDelete(category.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-4">
             {categories.map((category) => (
-              <TableRow key={category.id} className="border-eka-jade-luxury/20">
-                <TableCell className="text-eka-pearl font-medium">{category.name}</TableCell>
-                <TableCell className="text-eka-pearl">{category.description || 'N/A'}</TableCell>
-                <TableCell className="text-eka-pearl">
-                  {category.image_url ? (
-                    <img src={category.image_url} alt={category.name} className="w-12 h-12 object-cover rounded" />
-                  ) : (
-                    'No image'
+              <div key={category.id} className="bg-eka-emerald-depth/20 backdrop-blur-sm rounded-lg border border-eka-jade-luxury/30 p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-heading text-eka-pearl mb-1">{category.name}</h3>
+                    <p className="text-sm text-eka-champagne line-clamp-2">{category.description || 'No description'}</p>
+                  </div>
+                  {category.image_url && (
+                    <img src={category.image_url} alt={category.name} className="w-16 h-16 object-cover rounded ml-3" />
                   )}
-                </TableCell>
-                <TableCell className="text-eka-pearl">
-                  {new Date(category.created_at).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
+                </div>
+                <div className="flex justify-between items-center pt-3 border-t border-eka-jade-luxury/20">
+                  <span className="text-xs text-eka-champagne">
+                    {new Date(category.created_at).toLocaleDateString()}
+                  </span>
                   <div className="flex space-x-2">
                     <Button
                       variant="outline"
@@ -275,12 +337,12 @@ export const CategoriesManager = () => {
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
-                </TableCell>
-              </TableRow>
+                </div>
+              </div>
             ))}
-          </TableBody>
-        </Table>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

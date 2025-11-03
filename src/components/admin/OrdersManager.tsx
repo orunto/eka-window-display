@@ -133,35 +133,110 @@ export const OrdersManager = () => {
         </div>
       </div>
 
-      <div className="bg-eka-emerald-depth/20 backdrop-blur-sm rounded-lg border border-eka-jade-luxury/30 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-eka-jade-luxury/20">
-              <tr>
-                <th className="px-4 py-3 text-left text-eka-pearl">Order ID</th>
-                <th className="px-4 py-3 text-left text-eka-pearl">Customer</th>
-                <th className="px-4 py-3 text-left text-eka-pearl">Total</th>
-                <th className="px-4 py-3 text-left text-eka-pearl">Status</th>
-                <th className="px-4 py-3 text-left text-eka-pearl">Date</th>
-                <th className="px-4 py-3 text-left text-eka-pearl">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-eka-jade-luxury/20">
-              {orders.map((order) => (
-                <tr key={order.id} className="hover:bg-eka-jade-luxury/10">
-                  <td className="px-4 py-3 text-eka-champagne font-mono text-sm">
-                    {order.id.substring(0, 8)}...
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-col">
-                      <span className="text-eka-pearl">{order.customer_name || 'N/A'}</span>
-                      <span className="text-xs text-eka-champagne">{order.customer_email || 'N/A'}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-eka-golden font-semibold">
-                    ${order.total_amount.toFixed(2)}
-                  </td>
-                  <td className="px-4 py-3">
+      {orders.length === 0 ? (
+        <div className="bg-eka-emerald-depth/20 backdrop-blur-sm rounded-lg border border-eka-jade-luxury/30 p-12 text-center">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <Package className="w-16 h-16 text-eka-jade-luxury/40" />
+            <h3 className="text-xl font-heading text-eka-pearl">No orders yet</h3>
+            <p className="text-eka-champagne">Orders will appear here when customers place them</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Desktop Table View */}
+          <div className="hidden md:block bg-eka-emerald-depth/20 backdrop-blur-sm rounded-lg border border-eka-jade-luxury/30 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-eka-jade-luxury/20">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Order ID</th>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Customer</th>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Total</th>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Status</th>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Date</th>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-eka-jade-luxury/20">
+                  {orders.map((order) => (
+                    <tr key={order.id} className="hover:bg-eka-jade-luxury/10">
+                      <td className="px-4 py-3 text-eka-champagne font-mono text-sm">
+                        {order.id.substring(0, 8)}...
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-col">
+                          <span className="text-eka-pearl">{order.customer_name || 'N/A'}</span>
+                          <span className="text-xs text-eka-champagne">{order.customer_email || 'N/A'}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-eka-golden font-semibold">
+                        ${order.total_amount.toFixed(2)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Select
+                          value={order.status}
+                          onValueChange={(value) => updateOrderStatus(order.id, value)}
+                        >
+                          <SelectTrigger className={`w-32 bg-eka-emerald-depth/20 border-eka-jade-luxury/30 ${getStatusColor(order.status)}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="processing">Processing</SelectItem>
+                            <SelectItem value="shipped">Shipped</SelectItem>
+                            <SelectItem value="delivered">Delivered</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className="px-4 py-3 text-eka-champagne">
+                        {new Date(order.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Button
+                          onClick={() => handleViewOrder(order)}
+                          size="sm"
+                          variant="outline"
+                          className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-4">
+            {orders.map((order) => (
+              <div key={order.id} className="bg-eka-emerald-depth/20 backdrop-blur-sm rounded-lg border border-eka-jade-luxury/30 p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1">
+                    <h3 className="text-sm font-mono text-eka-champagne mb-1">
+                      {order.id.substring(0, 8)}...
+                    </h3>
+                    <p className="text-base font-heading text-eka-pearl">{order.customer_name || 'N/A'}</p>
+                    <p className="text-xs text-eka-champagne">{order.customer_email || 'N/A'}</p>
+                  </div>
+                  <Button
+                    onClick={() => handleViewOrder(order)}
+                    size="sm"
+                    variant="outline"
+                    className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-eka-champagne">Total:</span>
+                    <span className="text-eka-golden font-semibold">${order.total_amount.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-eka-champagne">Status:</span>
                     <Select
                       value={order.status}
                       onValueChange={(value) => updateOrderStatus(order.id, value)}
@@ -177,26 +252,17 @@ export const OrdersManager = () => {
                         <SelectItem value="cancelled">Cancelled</SelectItem>
                       </SelectContent>
                     </Select>
-                  </td>
-                  <td className="px-4 py-3 text-eka-champagne">
-                    {new Date(order.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Button
-                      onClick={() => handleViewOrder(order)}
-                      size="sm"
-                      variant="outline"
-                      className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-eka-champagne">Date:</span>
+                    <span className="text-eka-pearl">{new Date(order.created_at).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       <Dialog open={isViewingOrder} onOpenChange={setIsViewingOrder}>
         <DialogContent className="max-w-3xl bg-eka-emerald-depth border-eka-jade-luxury/30">

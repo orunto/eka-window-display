@@ -439,30 +439,125 @@ export const ProductsManager = () => {
         </div>
       )}
 
-      <div className="bg-eka-emerald-depth/20 backdrop-blur-sm rounded-lg border border-eka-jade-luxury/30 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-eka-jade-luxury/20">
-              <tr>
-                <th className="px-4 py-3 text-left text-eka-pearl">Name</th>
-                <th className="px-4 py-3 text-left text-eka-pearl">Category</th>
-                <th className="px-4 py-3 text-left text-eka-pearl">Collection</th>
-                <th className="px-4 py-3 text-left text-eka-pearl">Price</th>
-                <th className="px-4 py-3 text-left text-eka-pearl">Tier</th>
-                <th className="px-4 py-3 text-left text-eka-pearl">Status</th>
-                <th className="px-4 py-3 text-left text-eka-pearl">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-eka-jade-luxury/20">
-              {products.map((product) => (
-                <tr key={product.id} className="hover:bg-eka-jade-luxury/10">
-                  <td className="px-4 py-3 text-eka-pearl">{product.name}</td>
-                  <td className="px-4 py-3 text-eka-champagne">{product.categories?.name || 'Uncategorized'}</td>
-                  <td className="px-4 py-3 text-eka-champagne">{product.collections?.name || 'No collection'}</td>
-                  <td className="px-4 py-3 text-eka-champagne">${product.price || 'N/A'}</td>
-                  <td className="px-4 py-3 text-eka-champagne">Tier {product.tier}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-col space-y-1">
+      {products.length === 0 ? (
+        <div className="bg-eka-emerald-depth/20 backdrop-blur-sm rounded-lg border border-eka-jade-luxury/30 p-12 text-center">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <Plus className="w-16 h-16 text-eka-jade-luxury/40" />
+            <h3 className="text-xl font-heading text-eka-pearl">No products yet</h3>
+            <p className="text-eka-champagne">Get started by adding your first product</p>
+            <Button
+              onClick={() => setIsEditing(true)}
+              className="bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Your First Product
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Desktop Table View */}
+          <div className="hidden md:block bg-eka-emerald-depth/20 backdrop-blur-sm rounded-lg border border-eka-jade-luxury/30 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-eka-jade-luxury/20">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Name</th>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Category</th>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Collection</th>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Price</th>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Tier</th>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Status</th>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-eka-jade-luxury/20">
+                  {products.map((product) => (
+                    <tr key={product.id} className="hover:bg-eka-jade-luxury/10">
+                      <td className="px-4 py-3 text-eka-pearl">{product.name}</td>
+                      <td className="px-4 py-3 text-eka-champagne">{product.categories?.name || 'Uncategorized'}</td>
+                      <td className="px-4 py-3 text-eka-champagne">{product.collections?.name || 'No collection'}</td>
+                      <td className="px-4 py-3 text-eka-champagne">${product.price || 'N/A'}</td>
+                      <td className="px-4 py-3 text-eka-champagne">Tier {product.tier}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-col space-y-1">
+                          <span className={`text-xs px-2 py-1 rounded ${product.in_stock ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                            {product.in_stock ? 'In Stock' : 'Out of Stock'}
+                          </span>
+                          {product.featured && (
+                            <span className="text-xs px-2 py-1 rounded bg-eka-golden/20 text-eka-golden">
+                              Featured
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex space-x-2">
+                          <Button
+                            onClick={() => handleEdit(product)}
+                            size="sm"
+                            variant="outline"
+                            className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            onClick={() => handleDelete(product.id)}
+                            size="sm"
+                            variant="outline"
+                            className="border-red-500/30 text-red-400 hover:bg-red-500/20"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-4">
+            {products.map((product) => (
+              <div key={product.id} className="bg-eka-emerald-depth/20 backdrop-blur-sm rounded-lg border border-eka-jade-luxury/30 p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-heading text-eka-pearl mb-1">{product.name}</h3>
+                    <p className="text-sm text-eka-champagne">{product.categories?.name || 'Uncategorized'}</p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={() => handleEdit(product)}
+                      size="sm"
+                      variant="outline"
+                      className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      onClick={() => handleDelete(product.id)}
+                      size="sm"
+                      variant="outline"
+                      className="border-red-500/30 text-red-400 hover:bg-red-500/20"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-eka-champagne">Price:</span>
+                    <span className="text-eka-pearl">${product.price || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-eka-champagne">Tier:</span>
+                    <span className="text-eka-pearl">Tier {product.tier}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-eka-champagne">Status:</span>
+                    <div className="flex flex-wrap gap-1">
                       <span className={`text-xs px-2 py-1 rounded ${product.in_stock ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                         {product.in_stock ? 'In Stock' : 'Out of Stock'}
                       </span>
@@ -472,33 +567,13 @@ export const ProductsManager = () => {
                         </span>
                       )}
                     </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex space-x-2">
-                      <Button
-                        onClick={() => handleEdit(product)}
-                        size="sm"
-                        variant="outline"
-                        className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        onClick={() => handleDelete(product.id)}
-                        size="sm"
-                        variant="outline"
-                        className="border-red-500/30 text-red-400 hover:bg-red-500/20"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };
