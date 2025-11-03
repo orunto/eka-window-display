@@ -10,7 +10,6 @@ export const AdminAuth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
   const { toast } = useToast();
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -18,36 +17,17 @@ export const AdminAuth = () => {
     setLoading(true);
 
     try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: email.split('@')[0]
-            }
-          }
-        });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-        if (error) throw error;
+      if (error) throw error;
 
-        toast({
-          title: "Account created",
-          description: "Please check your email for verification link",
-        });
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) throw error;
-
-        toast({
-          title: "Signed in successfully",
-          description: "Welcome to the admin dashboard",
-        });
-      }
+      toast({
+        title: "Signed in successfully",
+        description: "Welcome to the admin dashboard",
+      });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -64,7 +44,7 @@ export const AdminAuth = () => {
       <div className="relative p-8 rounded-3xl bg-gradient-glass backdrop-blur-xl shadow-xl border border-eka-jade-luxury/30">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-heading text-eka-pearl mb-2">
-            Admin {isSignUp ? 'Sign Up' : 'Login'}
+            Admin Login
           </h1>
           <p className="text-eka-champagne">
             Access the admin dashboard
@@ -101,18 +81,9 @@ export const AdminAuth = () => {
             className="w-full bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth"
             disabled={loading}
           >
-            {loading ? "Loading..." : (isSignUp ? "Sign Up" : "Sign In")}
+            {loading ? "Loading..." : "Sign In"}
           </Button>
         </form>
-
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-eka-champagne hover:text-eka-golden transition-colors"
-          >
-            {isSignUp ? "Already have an account? Sign In" : "Need an account? Sign Up"}
-          </button>
-        </div>
       </div>
     </div>
   );

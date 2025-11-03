@@ -43,6 +43,7 @@ export type Database = {
       }
       client_applications: {
         Row: {
+          about_yourself: string | null
           created_at: string
           email: string
           full_name: string
@@ -53,6 +54,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          about_yourself?: string | null
           created_at?: string
           email: string
           full_name: string
@@ -63,6 +65,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          about_yourself?: string | null
           created_at?: string
           email?: string
           full_name?: string
@@ -358,10 +361,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "customer"

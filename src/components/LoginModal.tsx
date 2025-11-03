@@ -27,6 +27,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [clientEmail, setClientEmail] = useState("");
   const [clientName, setClientName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [aboutYourself, setAboutYourself] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +74,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
           full_name: clientName,
           email: clientEmail,
           phone_number: phoneNumber,
+          about_yourself: aboutYourself,
         });
 
       if (error) throw error;
@@ -85,6 +87,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
       setClientName("");
       setClientEmail("");
       setPhoneNumber("");
+      setAboutYourself("");
       setShowApplication(false);
       onClose();
     } catch (error: any) {
@@ -163,6 +166,21 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                 className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[44px]"
                 placeholder="+234 XXX XXX XXXX"
                 required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="aboutYourself" className="text-sm text-eka-champagne">
+                Tell us about yourself and why you want to be an Eka client
+              </Label>
+              <Textarea
+                id="aboutYourself"
+                value={aboutYourself}
+                onChange={(e) => setAboutYourself(e.target.value)}
+                className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 min-h-[100px]"
+                placeholder="Tell us about yourself..."
+                required
+                rows={4}
               />
             </div>
 

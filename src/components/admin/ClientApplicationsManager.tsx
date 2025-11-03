@@ -29,6 +29,7 @@ interface ClientApplication {
   phone_number: string;
   status: string;
   notes: string | null;
+  about_yourself: string | null;
   created_at: string;
 }
 
@@ -171,6 +172,13 @@ export default function ClientApplicationsManager() {
               <p className="text-sm">{selectedApp.email}</p>
               <p className="text-sm">{selectedApp.phone_number}</p>
             </div>
+            
+            {selectedApp.about_yourself && (
+              <div>
+                <p className="text-sm text-muted-foreground">About</p>
+                <p className="text-sm whitespace-pre-wrap">{selectedApp.about_yourself}</p>
+              </div>
+            )}
             
             <div className="space-y-2">
               <Label htmlFor="notes">Notes</Label>
