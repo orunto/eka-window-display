@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProductsManager } from "./ProductsManager";
 import { CategoriesManager } from "./CategoriesManager";
 import { CollectionsManager } from "./CollectionsManager";
@@ -9,11 +8,14 @@ import { OrdersManager } from "./OrdersManager";
 import ClientApplicationsManager from "./ClientApplicationsManager";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AdminSidebar } from "./AdminSidebar";
 
 export const AdminDashboard = () => {
   const { toast } = useToast();
+  const [activeView, setActiveView] = useState("applications");
 
   const handleSignOut = async () => {
     try {
@@ -33,71 +35,58 @@ export const AdminDashboard = () => {
     }
   };
 
+  const renderContent = () => {
+    switch (activeView) {
+      case "applications":
+        return <ClientApplicationsManager />;
+      case "orders":
+        return <OrdersManager />;
+      case "products":
+        return <ProductsManager />;
+      case "categories":
+        return <CategoriesManager />;
+      case "collections":
+        return <CollectionsManager />;
+      case "users":
+        return <UsersManager />;
+      default:
+        return <ClientApplicationsManager />;
+    }
+  };
+
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-center sm:text-left">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading text-eka-pearl mb-2">Admin Dashboard</h1>
-          <p className="text-base sm:text-lg lg:text-xl text-eka-champagne">Manage your Eka store data</p>
+    <SidebarProvider defaultOpen={false}>
+      <div className="flex min-h-screen w-full">
+        <AdminSidebar activeView={activeView} onViewChange={setActiveView} />
+        
+        <div className="flex-1 flex flex-col">
+          <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-eka-jade-luxury/30 bg-gradient-glass backdrop-blur-xl px-4 sm:px-6">
+            <SidebarTrigger className="text-eka-pearl hover:text-eka-golden">
+              <Menu className="h-5 w-5" />
+            </SidebarTrigger>
+            
+            <div className="flex-1 text-center sm:text-left">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-heading text-eka-pearl">Admin Dashboard</h1>
+            </div>
+            
+            <Button
+              onClick={handleSignOut}
+              variant="outline"
+              size="sm"
+              className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
+            >
+              <LogOut className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Sign Out</span>
+            </Button>
+          </header>
+
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+            <div className="bg-gradient-glass backdrop-blur-xl rounded-3xl border border-eka-jade-luxury/30 p-4 sm:p-6 lg:p-8">
+              {renderContent()}
+            </div>
+          </main>
         </div>
-        <Button
-          onClick={handleSignOut}
-          variant="outline"
-          className="border-eka-jade-luxury/30 text-eka-pearl hover:bg-eka-jade-luxury/20"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Sign Out
-        </Button>
       </div>
-
-      <div className="bg-gradient-glass backdrop-blur-xl rounded-3xl border border-eka-jade-luxury/30 p-4 sm:p-6 lg:p-8">
-        <Tabs defaultValue="applications" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 bg-eka-emerald-depth/20 h-auto gap-1">
-            <TabsTrigger value="applications" className="text-xs sm:text-sm text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
-              Applications
-            </TabsTrigger>
-            <TabsTrigger value="orders" className="text-xs sm:text-sm text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
-              Orders
-            </TabsTrigger>
-            <TabsTrigger value="products" className="text-xs sm:text-sm text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
-              Products
-            </TabsTrigger>
-            <TabsTrigger value="categories" className="text-xs sm:text-sm text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
-              Categories
-            </TabsTrigger>
-            <TabsTrigger value="collections" className="text-xs sm:text-sm text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
-              Collections
-            </TabsTrigger>
-            <TabsTrigger value="users" className="text-xs sm:text-sm text-eka-pearl data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
-              Users
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="applications" className="space-y-4">
-            <ClientApplicationsManager />
-          </TabsContent>
-
-          <TabsContent value="orders" className="space-y-4">
-            <OrdersManager />
-          </TabsContent>
-
-          <TabsContent value="products" className="space-y-4">
-            <ProductsManager />
-          </TabsContent>
-
-          <TabsContent value="categories" className="space-y-4">
-            <CategoriesManager />
-          </TabsContent>
-
-          <TabsContent value="collections" className="space-y-4">
-            <CollectionsManager />
-          </TabsContent>
-
-          <TabsContent value="users" className="space-y-4">
-            <UsersManager />
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
+    </SidebarProvider>
   );
 };
