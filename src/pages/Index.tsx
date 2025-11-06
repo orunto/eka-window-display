@@ -15,6 +15,8 @@ const Index = () => {
       
       <EkaHeader />
       
+      <div className="pt-16 sm:pt-20" />
+      
       {/* Featured Products */}
       <section className="py-24 relative z-10">
         <div className="container mx-auto px-4">

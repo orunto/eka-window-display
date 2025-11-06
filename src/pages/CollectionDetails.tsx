@@ -33,7 +33,7 @@ const CollectionDetails = () => {
     return (
       <div className="min-h-screen bg-background">
         <EkaHeader />
-        <div className="container mx-auto px-4 py-20">
+        <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28">
           <p>Collection not found</p>
         </div>
       </div>
@@ -59,7 +59,7 @@ const CollectionDetails = () => {
     <div className="min-h-screen bg-background">
       <EkaHeader />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pt-24 sm:pt-28">
         {/* Back Button */}
         <Button 
           variant="ghost" 

@@ -42,7 +42,7 @@ const ProductDetails = () => {
     return (
       <div className="min-h-screen bg-background">
         <EkaHeader />
-        <div className="container mx-auto px-4 py-20">
+        <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28">
           <p>Product not found</p>
         </div>
       </div>
@@ -93,7 +93,7 @@ const ProductDetails = () => {
       
       <EkaHeader />
       
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 pt-20 sm:pt-24 relative z-10">
         {/* Back Button */}
         <Button 
           variant="ghost" 

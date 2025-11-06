@@ -38,7 +38,7 @@ const CategoryDetails = () => {
     return (
       <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
         <EkaHeader />
-        <div className="container mx-auto px-4 py-20 text-center">
+        <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28 text-center">
           <p className="text-xl text-eka-champagne">Loading...</p>
         </div>
         <EkaFooter />
@@ -50,7 +50,7 @@ const CategoryDetails = () => {
     return (
       <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
         <EkaHeader />
-        <div className="container mx-auto px-4 py-20 text-center">
+        <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28 text-center">
           <p className="text-xl text-eka-champagne">Category not found</p>
           <Button 
             variant="ghost" 
@@ -74,7 +74,7 @@ const CategoryDetails = () => {
       
       <EkaHeader />
       
-      <div className="container mx-auto px-4 py-8 relative z-10">
+      <div className="container mx-auto px-4 py-8 pt-24 sm:pt-28 relative z-10">
         {/* Back Button */}
         <Button 
           variant="ghost" 

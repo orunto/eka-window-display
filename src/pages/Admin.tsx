@@ -117,7 +117,7 @@ const Admin = () => {
     <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
       <EkaHeader />
       
-      <div className="container mx-auto px-4 py-20 relative z-10">
+      <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28 relative z-10">
         {!user ? (
           <AdminAuth />
         ) : !isAdmin ? (

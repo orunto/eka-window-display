@@ -46,7 +46,7 @@ const ProductCategories = () => {
       
       <EkaHeader />
       
-      <div className="container mx-auto px-4 py-20 relative z-10">
+      <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28 relative z-10">
         <div className="text-center mb-20">
           <div className="relative inline-block p-12 rounded-3xl bg-gradient-glass backdrop-blur-xl shadow-xl border border-eka-jade-luxury/30">
             <div className="absolute inset-0 bg-gradient-accent opacity-[0.05] rounded-3xl" />

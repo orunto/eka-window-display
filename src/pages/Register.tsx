@@ -31,6 +31,23 @@ export default function Register() {
     setIsLoading(true);
 
     try {
+      // Check if user already exists
+      const { data: existingUser } = await supabase.auth.signInWithPassword({
+        email,
+        password: 'dummy-check-only'
+      });
+
+      // If we get here and there's an existing session, user already has an account
+      if (existingUser?.session || existingUser?.user) {
+        toast({
+          title: "Account Already Exists",
+          description: "You're already a customer. Please use the sign-in button to access your account.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Check if email is in approved applications
       const { data: application, error: appError } = await supabase
         .from('client_applications')
@@ -63,11 +80,20 @@ export default function Register() {
       });
 
       if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
+        // Check if error is about user already existing
+        if (error.message.includes("already registered") || error.message.includes("already exists")) {
+          toast({
+            title: "Account Already Exists",
+            description: "You're already a customer. Please use the sign-in button to access your account.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
       } else {
         toast({
           title: "Success",
@@ -75,7 +101,13 @@ export default function Register() {
         });
         setTimeout(() => navigate("/"), 2000);
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Check if it's an existing user error
+      if (error?.message?.includes("Invalid login credentials")) {
+        // This is actually good - means user doesn't exist yet, continue with signup
+        // But we already handled the signup above, so this shouldn't happen
+      }
+      
       toast({
         title: "Error",
         description: "An unexpected error occurred",
@@ -144,16 +176,6 @@ export default function Register() {
             Create Account
           </Button>
         </form>
-
-        <p className="text-center mt-6 text-sm text-eka-champagne">
-          Already have an account?{" "}
-          <button
-            onClick={() => navigate("/")}
-            className="text-eka-golden hover:underline"
-          >
-            Sign in
-          </button>
-        </p>
       </div>
     </div>
   );

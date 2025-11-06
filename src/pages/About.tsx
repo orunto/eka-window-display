@@ -6,7 +6,7 @@ const About = () => {
     <div className="min-h-screen bg-background">
       <EkaHeader />
       
-      <div className="container mx-auto px-4 py-20">
+      <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28">
         {/* Hero Section */}
         <div className="text-center mb-20 space-y-8">
           <h1 className="text-4xl md:text-6xl font-heading text-eka-deep-forest">
