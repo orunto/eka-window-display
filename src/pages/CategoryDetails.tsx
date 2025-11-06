@@ -6,17 +6,18 @@ import { EkaFooter } from "@/components/EkaFooter";
 import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { mockProducts } from "@/data/mockData";
+import { useCategory } from "@/hooks/useCategories";
+import { useProducts } from "@/hooks/useProducts";
 
 const CategoryDetails = () => {
-  const { category } = useParams();
+  const { category: categoryId } = useParams();
   const navigate = useNavigate();
+  const { category, loading: categoryLoading } = useCategory(categoryId);
+  const { products, loading: productsLoading } = useProducts({ categoryId });
 
   useEffect(() => {
-    // Scroll to top when component mounts
     window.scrollTo(0, 0);
     
-    // Load fonts
     const loadFonts = () => {
       const link1 = document.createElement('link');
       link1.href = 'https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap';
@@ -31,46 +32,39 @@ const CategoryDetails = () => {
     loadFonts();
   }, []);
 
-  const categoryProducts = mockProducts.filter(p => 
-    p.category.toLowerCase() === category?.toLowerCase()
-  );
+  const loading = categoryLoading || productsLoading;
 
-  const getCategoryDescription = () => {
-    switch (category?.toLowerCase()) {
-      case 'tops':
-        return {
-          title: 'Tops',
-          description: 'Sophisticated blouses, blazers, and statement pieces designed for the modern professional.',
-          philosophy: 'Our tops collection embodies the perfect balance of structure and fluidity, creating pieces that transition seamlessly from boardroom to evening soirée.'
-        };
-      case 'bottoms':
-        return {
-          title: 'Bottoms',
-          description: 'Tailored trousers, elegant skirts, and contemporary silhouettes for every occasion.',
-          philosophy: 'Precision tailoring meets contemporary design in our bottoms collection, where every cut and seam is crafted to enhance the natural elegance of movement.'
-        };
-      case 'ensembles':
-        return {
-          title: 'Ensembles',
-          description: 'Complete coordinated sets and statement dresses that embody Afromodern elegance.',
-          philosophy: 'Our ensembles represent the pinnacle of coordinated luxury, where each piece works in harmony to create a complete vision of sophisticated style.'
-        };
-      case 'accessories':
-        return {
-          title: 'Accessories',
-          description: 'Luxury jewelry, handbags, and finishing touches that complete your distinctive look.',
-          philosophy: 'The perfect accessories are not just additions—they are the exclamation point of personal style, carefully crafted to elevate every ensemble.'
-        };
-      default:
-        return {
-          title: category || 'Category',
-          description: 'Explore our carefully curated selection of luxury fashion pieces.',
-          philosophy: 'Each piece in this category represents our commitment to exceptional craftsmanship and contemporary design.'
-        };
-    }
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
+        <EkaHeader />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <p className="text-xl text-eka-champagne">Loading...</p>
+        </div>
+        <EkaFooter />
+      </div>
+    );
+  }
 
-  const categoryInfo = getCategoryDescription();
+  if (!category) {
+    return (
+      <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
+        <EkaHeader />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <p className="text-xl text-eka-champagne">Category not found</p>
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/categories')}
+            className="mt-4 text-eka-pearl hover:text-eka-golden"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Categories
+          </Button>
+        </div>
+        <EkaFooter />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
@@ -91,43 +85,66 @@ const CategoryDetails = () => {
           Back to Categories
         </Button>
 
+        {/* Category Header with Image */}
+        {category.image_url && (
+          <div className="relative h-64 md:h-96 rounded-3xl overflow-hidden mb-12">
+            <img 
+              src={category.image_url} 
+              alt={category.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-eka-emerald-depth/60 via-eka-emerald-depth/40 to-eka-emerald-depth/20" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <h1 className="text-4xl md:text-6xl font-heading font-normal text-eka-pearl">
+                {category.name}
+              </h1>
+            </div>
+          </div>
+        )}
+
         {/* Category Introduction */}
         <div className="text-center mb-16 space-y-6">
-          <h1 className="text-4xl md:text-5xl font-heading font-normal text-obsidian-depth">
-            {categoryInfo.title}
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            {categoryInfo.description}
-          </p>
+          {!category.image_url && (
+            <h1 className="text-4xl md:text-5xl font-heading font-normal text-obsidian-depth">
+              {category.name}
+            </h1>
+          )}
           
-          <div className="bg-pearl-mist p-8 rounded-lg max-w-4xl mx-auto">
-            <h2 className="text-2xl font-heading font-normal text-obsidian-depth mb-4">
-              Our Philosophy
-            </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              {categoryInfo.philosophy}
-            </p>
-          </div>
+          {category.description && (
+            <div className="bg-pearl-mist p-8 rounded-lg max-w-4xl mx-auto">
+              <p className="text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                {category.description}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Products Grid */}
         <div className="space-y-8">
           <div className="text-center">
             <p className="text-lg text-muted-foreground">
-              {categoryProducts.length} pieces available
+              {products.length} pieces available
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {categoryProducts.map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product}
-              />
-            ))}
-          </div>
-
-          {categoryProducts.length === 0 && (
+          {products.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {products.map((product) => (
+                <ProductCard 
+                  key={product.id} 
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    image: product.image_url || 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500&h=600&fit=crop',
+                    price: product.price ? Number(product.price) : undefined,
+                    category: category.name,
+                    tier: (product.tier || 'B') as "A" | "B" | "C",
+                    description: product.description || '',
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No products found in this category.</p>
             </div>
