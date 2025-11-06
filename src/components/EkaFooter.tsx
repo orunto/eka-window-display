@@ -1,9 +1,20 @@
 
-import { useEffect } from "react";
-import { Instagram, Mail, MapPin, Phone } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Instagram, Mail, MapPin, Phone, Facebook, Twitter } from "lucide-react";
 
 export const EkaFooter = () => {
+  const [contactInfo, setContactInfo] = useState({
+    email: "",
+    phone: "",
+    address: "",
+    instagram: "",
+    twitter: "",
+    facebook: "",
+  });
+
   useEffect(() => {
+    fetchContactInfo();
     // Load fonts
     const loadFonts = () => {
       const link1 = document.createElement('link');
@@ -18,6 +29,27 @@ export const EkaFooter = () => {
     };
     loadFonts();
   }, []);
+
+  const fetchContactInfo = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("key, value")
+        .in("key", ["contact_email", "contact_phone", "contact_address", "social_instagram", "social_twitter", "social_facebook"]);
+
+      if (error) throw error;
+
+      const info = data.reduce((acc, item) => {
+        const key = item.key.replace("contact_", "").replace("social_", "");
+        acc[key] = item.value;
+        return acc;
+      }, {} as any);
+
+      setContactInfo(info);
+    } catch (error) {
+      console.error("Error fetching contact info:", error);
+    }
+  };
 
   return (
     <footer className="relative bg-gradient-to-br from-eka-emerald-depth via-eka-jade-luxury to-eka-emerald-depth overflow-hidden">
@@ -74,14 +106,14 @@ export const EkaFooter = () => {
                 </a>
               </div>
               <div className="space-y-4">
-                <a href="#" className="block text-eka-champagne hover:text-eka-golden transition-colors duration-300 text-lg">
+                <a href="/bespoke" className="block text-eka-champagne hover:text-eka-golden transition-colors duration-300 text-lg">
                   Bespoke
                 </a>
-                <a href="#" className="block text-eka-champagne hover:text-eka-golden transition-colors duration-300 text-lg">
-                  Heritage Club
+                <a href="/dashboard" className="block text-eka-champagne hover:text-eka-golden transition-colors duration-300 text-lg">
+                  Dashboard
                 </a>
-                <a href="#" className="block text-eka-champagne hover:text-eka-golden transition-colors duration-300 text-lg">
-                  Contact
+                <a href="/register" className="block text-eka-champagne hover:text-eka-golden transition-colors duration-300 text-lg">
+                  Become a Client
                 </a>
               </div>
             </div>
@@ -95,21 +127,21 @@ export const EkaFooter = () => {
                 <div className="w-10 h-10 bg-gradient-glass rounded-xl flex items-center justify-center border border-eka-jade-luxury/30">
                   <Mail className="w-5 h-5" />
                 </div>
-                <span className="text-lg">hello@eka-luxury.com</span>
+                <span className="text-lg">{contactInfo.email || "hello@eka-luxury.com"}</span>
               </div>
               
               <div className="flex items-center space-x-4 text-eka-champagne">
                 <div className="w-10 h-10 bg-gradient-glass rounded-xl flex items-center justify-center border border-eka-jade-luxury/30">
                   <Phone className="w-5 h-5" />
                 </div>
-                <span className="text-lg">+44 20 7123 4567</span>
+                <span className="text-lg">{contactInfo.phone || "+44 20 7123 4567"}</span>
               </div>
               
               <div className="flex items-center space-x-4 text-eka-champagne">
                 <div className="w-10 h-10 bg-gradient-glass rounded-xl flex items-center justify-center border border-eka-jade-luxury/30">
                   <MapPin className="w-5 h-5" />
                 </div>
-                <span className="text-lg">London • Lagos • New York</span>
+                <span className="text-lg">{contactInfo.address || "London • Lagos • New York"}</span>
               </div>
             </div>
 
@@ -117,18 +149,36 @@ export const EkaFooter = () => {
             <div className="space-y-4">
               <p className="text-eka-pearl font-medium">Follow Our Journey</p>
               <div className="flex items-center space-x-4">
-                <a 
-                  href="#" 
-                  className="w-12 h-12 bg-gradient-accent rounded-xl flex items-center justify-center hover:scale-110 hover:shadow-glow transition-all duration-300 group"
-                >
-                  <Instagram className="w-6 h-6 text-eka-emerald-depth group-hover:scale-110 transition-transform duration-300" />
-                </a>
-                <a 
-                  href="#" 
-                  className="w-12 h-12 bg-gradient-glass rounded-xl flex items-center justify-center border border-eka-jade-luxury/30 hover:border-eka-golden/50 hover:scale-110 transition-all duration-300 group"
-                >
-                  <Mail className="w-6 h-6 text-eka-champagne group-hover:text-eka-golden transition-colors duration-300" />
-                </a>
+                {contactInfo.instagram && (
+                  <a 
+                    href={contactInfo.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 bg-gradient-accent rounded-xl flex items-center justify-center hover:scale-110 hover:shadow-glow transition-all duration-300 group"
+                  >
+                    <Instagram className="w-6 h-6 text-eka-emerald-depth group-hover:scale-110 transition-transform duration-300" />
+                  </a>
+                )}
+                {contactInfo.twitter && (
+                  <a 
+                    href={contactInfo.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 bg-gradient-glass rounded-xl flex items-center justify-center border border-eka-jade-luxury/30 hover:border-eka-golden/50 hover:scale-110 transition-all duration-300 group"
+                  >
+                    <Twitter className="w-6 h-6 text-eka-champagne group-hover:text-eka-golden transition-colors duration-300" />
+                  </a>
+                )}
+                {contactInfo.facebook && (
+                  <a 
+                    href={contactInfo.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 bg-gradient-glass rounded-xl flex items-center justify-center border border-eka-jade-luxury/30 hover:border-eka-golden/50 hover:scale-110 transition-all duration-300 group"
+                  >
+                    <Facebook className="w-6 h-6 text-eka-champagne group-hover:text-eka-golden transition-colors duration-300" />
+                  </a>
+                )}
               </div>
             </div>
           </div>

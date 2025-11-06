@@ -33,6 +33,7 @@ export const EkaHeader = () => {
     { name: "Home", path: "/" },
     { name: "Collections", path: "/collections" },
     { name: "Categories", path: "/categories" },
+    { name: "Bespoke", path: "/bespoke" },
     { name: "About", path: "/about" },
   ];
 
@@ -88,17 +89,26 @@ export const EkaHeader = () => {
             {!loading && (
               <div className="hidden sm:flex items-center gap-3">
                 {user ? (
-                  <div className="flex items-center gap-2 bg-eka-jade-luxury/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-eka-golden/30">
-                    <Check className="w-4 h-4 text-eka-golden" />
-                    <span className="text-sm text-eka-pearl">Client</span>
+                  <div className="flex items-center gap-2">
                     <Button
+                      onClick={() => navigate("/dashboard")}
                       variant="ghost"
-                      size="sm"
-                      onClick={handleSignOut}
-                      className="text-eka-champagne hover:text-eka-golden text-xs px-2 py-1 h-auto"
+                      className="text-eka-pearl hover:text-eka-golden"
                     >
-                      Sign Out
+                      Dashboard
                     </Button>
+                    <div className="flex items-center gap-2 bg-eka-jade-luxury/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-eka-golden/30">
+                      <Check className="w-4 h-4 text-eka-golden" />
+                      <span className="text-sm text-eka-pearl">Client</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleSignOut}
+                        className="text-eka-champagne hover:text-eka-golden text-xs px-2 py-1 h-auto"
+                      >
+                        Sign Out
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <Button
@@ -136,6 +146,14 @@ export const EkaHeader = () => {
                             <Check className="w-4 h-4" />
                             <span className="text-sm font-medium">Signed in as Client</span>
                           </div>
+                          <Button
+                            onClick={() => {
+                              handleNavigation("/dashboard");
+                            }}
+                            className="w-full bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth min-h-[44px] touch-manipulation"
+                          >
+                            My Dashboard
+                          </Button>
                           <Button
                             variant="outline"
                             size="sm"

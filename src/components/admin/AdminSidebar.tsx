@@ -1,4 +1,4 @@
-import { FileText, Package, ShoppingCart, FolderOpen, Users, Layers } from "lucide-react";
+import { FileText, Package, ShoppingCart, FolderOpen, Users, Layers, Settings } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 const items = [{
   title: "Applications",
@@ -24,6 +24,10 @@ const items = [{
   title: "Users",
   value: "users",
   icon: Users
+}, {
+  title: "Site Settings",
+  value: "settings",
+  icon: Settings
 }];
 interface AdminSidebarProps {
   activeView: string;

@@ -15,6 +15,8 @@ import CollectionDetails from "./pages/CollectionDetails";
 import CategoryDetails from "./pages/CategoryDetails";
 import Admin from "./pages/Admin";
 import Register from "./pages/Register";
+import ClientDashboard from "./pages/ClientDashboard";
+import Bespoke from "./pages/Bespoke";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +38,8 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<ClientDashboard />} />
+            <Route path="/bespoke" element={<Bespoke />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

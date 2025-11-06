@@ -301,30 +301,63 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string | null
+          delivery_address: string | null
           email: string | null
           full_name: string | null
           id: string
+          phone_number: string | null
           role: string | null
           tier: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          delivery_address?: string | null
           email?: string | null
           full_name?: string | null
           id: string
+          phone_number?: string | null
           role?: string | null
           tier?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          delivery_address?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
+          phone_number?: string | null
           role?: string | null
           tier?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          value?: string
         }
         Relationships: []
       }

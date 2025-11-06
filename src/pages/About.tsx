@@ -1,7 +1,40 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { EkaHeader } from "@/components/EkaHeader";
+import { EkaFooter } from "@/components/EkaFooter";
 import { Star, Users, Shield } from "lucide-react";
 
 const About = () => {
+  const [content, setContent] = useState({
+    title: "",
+    content: "",
+  });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchContent();
+  }, []);
+
+  const fetchContent = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("key, value")
+        .in("key", ["about_us_title", "about_us_content"]);
+
+      if (error) throw error;
+
+      const contentMap = data.reduce((acc, item) => {
+        const key = item.key.replace("about_us_", "");
+        acc[key] = item.value;
+        return acc;
+      }, {} as any);
+
+      setContent(contentMap);
+    } catch (error) {
+      console.error("Error fetching content:", error);
+    }
+  };
   return (
     <div className="min-h-screen bg-background">
       <EkaHeader />
@@ -10,12 +43,10 @@ const About = () => {
         {/* Hero Section */}
         <div className="text-center mb-20 space-y-8">
           <h1 className="text-4xl md:text-6xl font-heading text-eka-deep-forest">
-            Our Legacy
+            {content.title || "Our Legacy"}
           </h1>
-          <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-            Born from a mother's passion for bespoke craftsmanship, Eka has evolved from a hidden gem 
-            serving a close-knit community to a modern luxury brand that celebrates African heritage 
-            through contemporary elegance.
+          <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed whitespace-pre-line">
+            {content.content || "Born from a mother's passion for bespoke craftsmanship, Eka has evolved from a hidden gem serving a close-knit community to a modern luxury brand that celebrates African heritage through contemporary elegance."}
           </p>
         </div>
 
@@ -133,31 +164,7 @@ const About = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-eka-ink text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="text-center space-y-6">
-            <div className="flex items-center justify-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-accent rounded-full flex items-center justify-center">
-                <img 
-                  src="/lovable-uploads/0555df50-cd91-4e2c-95d7-7009f8e63ef9.png" 
-                  alt="Eka" 
-                  className="w-6 h-6 object-contain"
-                />
-              </div>
-              <h3 className="text-2xl font-heading tracking-wider text-eka-champagne">EKA</h3>
-            </div>
-            <p className="text-white/60 max-w-md mx-auto">
-              Timeless luxury, rooted in legacy. Celebrating individuality through African heritage.
-            </p>
-            <div className="border-t border-white/20 pt-6">
-              <p className="text-white/40 text-sm">
-                © 2024 Eka. Timeless luxury, rooted in legacy.
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <EkaFooter />
     </div>
   );
 };
