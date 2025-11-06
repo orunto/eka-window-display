@@ -4,7 +4,6 @@ import { EkaHeader } from "@/components/EkaHeader";
 import { EkaFooter } from "@/components/EkaFooter";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import ReactMarkdown from "react-markdown";
 
 export default function Bespoke() {
   const [content, setContent] = useState({
@@ -67,28 +66,28 @@ export default function Bespoke() {
         </div>
 
         <div className="bg-gradient-glass backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-eka-jade-luxury/30 mb-12">
-          <div className="prose prose-invert prose-lg max-w-none">
-            <ReactMarkdown
-              components={{
-                h2: ({ children }) => (
-                  <h2 className="text-3xl font-heading text-eka-pearl mb-6 mt-8 first:mt-0">
-                    {children}
+          <div className="prose prose-invert prose-lg max-w-none space-y-8">
+            {content.process.split('\n\n').map((section, index) => {
+              if (section.startsWith('## ')) {
+                return (
+                  <h2 key={index} className="text-3xl font-heading text-eka-pearl mb-6 mt-8 first:mt-0">
+                    {section.replace('## ', '')}
                   </h2>
-                ),
-                p: ({ children }) => (
-                  <p className="text-eka-champagne mb-4 leading-relaxed">
-                    {children}
+                );
+              } else if (section.startsWith('**') && section.endsWith('**')) {
+                return (
+                  <p key={index} className="text-eka-golden font-semibold mb-4 text-lg">
+                    {section.replace(/\*\*/g, '')}
                   </p>
-                ),
-                strong: ({ children }) => (
-                  <strong className="text-eka-golden font-semibold">
-                    {children}
-                  </strong>
-                ),
-              }}
-            >
-              {content.process}
-            </ReactMarkdown>
+                );
+              } else {
+                return (
+                  <p key={index} className="text-eka-champagne mb-4 leading-relaxed">
+                    {section}
+                  </p>
+                );
+              }
+            })}
           </div>
         </div>
 
