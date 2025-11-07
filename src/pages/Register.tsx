@@ -5,13 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -28,89 +31,57 @@ export default function Register() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate password match
+    if (password !== confirmPassword) {
+      toast({
+        title: "Passwords Don't Match",
+        description: "Please make sure both passwords are identical.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // Check if user already exists
-      const { data: existingUser } = await supabase.auth.signInWithPassword({
-        email,
-        password: 'dummy-check-only'
+      const response = await supabase.functions.invoke('register-user', {
+        body: {
+          email,
+          password,
+          fullName,
+        },
       });
 
-      // If we get here and there's an existing session, user already has an account
-      if (existingUser?.session || existingUser?.user) {
+      if (response.error) {
         toast({
-          title: "Account Already Exists",
-          description: "You're already a customer. Please use the sign-in button to access your account.",
+          title: "Error",
+          description: response.error.message || "An error occurred during registration",
           variant: "destructive",
         });
         setIsLoading(false);
         return;
       }
 
-      // Check if email is in approved applications
-      const { data: application, error: appError } = await supabase
-        .from('client_applications')
-        .select('status')
-        .eq('email', email)
-        .eq('status', 'approved')
-        .single();
+      const data = response.data;
 
-      if (appError || !application) {
+      if (data.error) {
         toast({
-          title: "Access Denied",
-          description: "Your application has not been approved yet. Please wait for approval.",
+          title: "Registration Failed",
+          description: data.error,
           variant: "destructive",
         });
-        setIsLoading(false);
-        return;
-      }
-
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            full_name: fullName,
-          }
-        }
-      });
-
-      if (error) {
-        // Check if error is about user already existing
-        if (error.message.includes("already registered") || error.message.includes("already exists")) {
-          toast({
-            title: "Account Already Exists",
-            description: "You're already a customer. Please use the sign-in button to access your account.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: error.message,
-            variant: "destructive",
-          });
-        }
-      } else {
+      } else if (data.success) {
         toast({
           title: "Success",
-          description: "Account created! Please check your email for verification.",
+          description: data.message,
         });
         setTimeout(() => navigate("/"), 2000);
       }
     } catch (error: any) {
-      // Check if it's an existing user error
-      if (error?.message?.includes("Invalid login credentials")) {
-        // This is actually good - means user doesn't exist yet, continue with signup
-        // But we already handled the signup above, so this shouldn't happen
-      }
-      
       toast({
         title: "Error",
-        description: "An unexpected error occurred",
+        description: error.message || "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -155,16 +126,48 @@ export default function Register() {
           
           <div className="space-y-2">
             <Label htmlFor="password" className="text-eka-champagne">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60"
-              placeholder="Create a password"
-              required
-              minLength={6}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 pr-10"
+                placeholder="Create a password"
+                required
+                minLength={6}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-eka-champagne/60 hover:text-eka-champagne transition-colors"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="text-eka-champagne">Confirm Password</Label>
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="bg-eka-sage-whisper/20 border-eka-jade-luxury/30 text-eka-pearl placeholder:text-eka-champagne/60 pr-10"
+                placeholder="Confirm your password"
+                required
+                minLength={6}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-eka-champagne/60 hover:text-eka-champagne transition-colors"
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           <Button 
