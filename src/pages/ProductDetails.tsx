@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useProductVariants } from "@/hooks/useProductVariants";
 import { slugify } from "@/utils/slugify";
+import { detectUserCurrency, formatCurrency, getProductPrice, type Currency } from "@/utils/currency";
 
 const ProductDetails = () => {
   const { slug } = useParams();
@@ -22,6 +23,7 @@ const ProductDetails = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageViewOpen, setIsImageViewOpen] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
+  const [currency, setCurrency] = useState<Currency>("USD");
 
   const { product, loading } = useProduct(slug);
   const { variants } = useProductVariants(product?.id);
@@ -59,6 +61,10 @@ const ProductDetails = () => {
       document.head.appendChild(link2);
     };
     loadFonts();
+  }, []);
+
+  useEffect(() => {
+    detectUserCurrency().then(setCurrency).catch(() => {});
   }, []);
 
   if (loading) {
@@ -198,17 +204,18 @@ const ProductDetails = () => {
               </p>
             </div>
 
-            {/* Price */}
-            {hasFullAccess && product.price && (
+            {hasFullAccess && getProductPrice(product as any, currency) !== null && (
               <div className="text-xl sm:text-2xl font-bold text-eka-pearl">
-                ${product.price.toLocaleString()}
+                {formatCurrency(getProductPrice(product as any, currency) as number, currency)}
               </div>
             )}
 
             {hasLimitedAccess && (
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                 <div className="text-xl sm:text-2xl font-bold text-eka-pearl blur-sm select-none">
-                  $XX,XXX
+                  {getProductPrice(product as any, currency) !== null
+                    ? formatCurrency(getProductPrice(product as any, currency) as number, currency)
+                    : '—'}
                 </div>
                 <div className="flex items-center gap-2 text-eka-champagne">
                   <Lock className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
@@ -236,11 +243,16 @@ const ProductDetails = () => {
                     >
                       <div className="text-sm font-medium">{variant.name}</div>
                       <div className="text-xs text-eka-champagne mt-1">{variant.type}</div>
-                      {variant.price_adjustment !== 0 && (
-                        <div className="text-xs text-eka-golden mt-1">
-                          {variant.price_adjustment > 0 ? '+' : ''}${variant.price_adjustment}
-                        </div>
-                      )}
+                        {variant.price_adjustment !== 0 && (
+                          <div className="text-xs text-eka-golden mt-1">
+                            {variant.price_adjustment > 0 ? '+' : ''}{`${variant.price_adjustment}%`}
+                            {getProductPrice(product as any, currency) ? (
+                              <span className="text-eka-champagne ml-1">
+                                ({formatCurrency(Math.abs((getProductPrice(product as any, currency)! * variant.price_adjustment) / 100), currency)})
+                              </span>
+                            ) : null}
+                          </div>
+                        )}
                       {variant.stock_quantity <= 5 && variant.stock_quantity > 0 && (
                         <div className="text-xs text-serene-sage mt-1">Only {variant.stock_quantity} left</div>
                       )}

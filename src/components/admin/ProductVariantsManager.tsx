@@ -26,6 +26,7 @@ export const ProductVariantsManager = ({ productId }: ProductVariantsManagerProp
     price_adjustment: "0",
     stock_quantity: "0",
   });
+  const [pendingVariants, setPendingVariants] = useState<Array<{ name: string; type: string; price_adjustment: string; stock_quantity: string }>>([]);
   const { toast } = useToast();
 
   useEffect(() => {
