@@ -7,6 +7,7 @@ import { UsersManager } from "./UsersManager";
 import { OrdersManager } from "./OrdersManager";
 import ClientApplicationsManager from "./ClientApplicationsManager";
 import { SiteSettingsManager } from "./SiteSettingsManager";
+import { PaymentSettingsManager } from "./PaymentSettingsManager";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LogOut, Menu } from "lucide-react";
@@ -52,6 +53,8 @@ export const AdminDashboard = () => {
         return <UsersManager />;
       case "settings":
         return <SiteSettingsManager />;
+      case "payments":
+        return <PaymentSettingsManager />;
       default:
         return <ClientApplicationsManager />;
     }

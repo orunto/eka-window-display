@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
+import { detectUserCurrency, formatCurrency, getProductPrice, type Currency } from "@/utils/currency";
 
 declare global {
   interface Window {
@@ -31,10 +32,12 @@ export default function Checkout() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [items, setItems] = useState<CheckoutItem[]>([]);
+  const [currency, setCurrency] = useState<Currency>("USD");
+  const [paymentKeys, setPaymentKeys] = useState<Record<string, string>>({});
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    checkUser();
+    initializeCheckout();
     loadPaystackScript();
     
     // Get items from location state
@@ -42,6 +45,37 @@ export default function Checkout() {
       setItems(location.state.items);
     }
   }, []);
+
+  const initializeCheckout = async () => {
+    await checkUser();
+    const detectedCurrency = await detectUserCurrency();
+    setCurrency(detectedCurrency);
+    await fetchPaymentKeys();
+  };
+
+  const fetchPaymentKeys = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("key, value")
+        .in("key", [
+          "paystack_public_key_ngn",
+          "paystack_public_key_usd",
+          "stripe_public_key_gbp",
+          "stripe_public_key_usd",
+        ]);
+
+      if (error) throw error;
+
+      const keys: Record<string, string> = {};
+      data?.forEach((item) => {
+        keys[item.key] = item.value;
+      });
+      setPaymentKeys(keys);
+    } catch (error) {
+      console.error("Error fetching payment keys:", error);
+    }
+  };
 
   const loadPaystackScript = () => {
     const script = document.createElement("script");
@@ -77,7 +111,10 @@ export default function Checkout() {
   };
 
   const calculateTotal = () => {
-    return items.reduce((sum, item) => sum + (item.product.price || 0) * item.quantity, 0);
+    return items.reduce((sum, item) => {
+      const price = getProductPrice(item.product, currency) || 0;
+      return sum + price * item.quantity;
+    }, 0);
   };
 
   const handlePayment = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -108,52 +145,75 @@ export default function Checkout() {
 
       if (orderError) throw orderError;
 
-      // Initialize Paystack payment
-      const handler = window.PaystackPop.setup({
-        key: "pk_test_xxxx", // Replace with your Paystack public key
-        email: email,
-        amount: total * 100, // Amount in kobo (multiply by 100)
-        currency: "NGN",
-        ref: order.id,
-        metadata: {
-          custom_fields: [
-            {
-              display_name: "Customer Name",
-              variable_name: "customer_name",
-              value: name,
-            },
-          ],
-        },
-        callback: async (response: any) => {
-          // Update order status
-          await supabase
-            .from("orders")
-            .update({ status: "completed" })
-            .eq("id", order.id);
+      // Determine payment provider and key based on currency
+      const usePaystack = currency === "NGN";
+      const paymentKey = usePaystack
+        ? currency === "NGN"
+          ? paymentKeys.paystack_public_key_ngn
+          : paymentKeys.paystack_public_key_usd
+        : currency === "GBP"
+        ? paymentKeys.stripe_public_key_gbp
+        : paymentKeys.stripe_public_key_usd;
 
-          toast({
-            title: "Payment Successful",
-            description: "Your order has been placed successfully!",
-          });
+      if (!paymentKey) {
+        throw new Error("Payment configuration not set up for this currency");
+      }
 
-          navigate("/orders");
-        },
-        onClose: () => {
-          toast({
-            title: "Payment Cancelled",
-            description: "You cancelled the payment process.",
-            variant: "destructive",
-          });
-          setProcessing(false);
-        },
-      });
+      if (usePaystack) {
+        // Initialize Paystack payment
+        const handler = window.PaystackPop.setup({
+          key: paymentKey,
+          email: email,
+          amount: total * 100, // Amount in kobo (multiply by 100)
+          currency: currency,
+          ref: order.id,
+          metadata: {
+            custom_fields: [
+              {
+                display_name: "Customer Name",
+                variable_name: "customer_name",
+                value: name,
+              },
+            ],
+          },
+          callback: async (response: any) => {
+            // Update order status
+            await supabase
+              .from("orders")
+              .update({ status: "completed" })
+              .eq("id", order.id);
 
-      handler.openIframe();
+            toast({
+              title: "Payment Successful",
+              description: "Your order has been placed successfully!",
+            });
+
+            navigate("/orders");
+          },
+          onClose: () => {
+            toast({
+              title: "Payment Cancelled",
+              description: "You cancelled the payment process.",
+              variant: "destructive",
+            });
+            setProcessing(false);
+          },
+        });
+
+        handler.openIframe();
+      } else {
+        // TODO: Implement Stripe payment for GBP
+        toast({
+          title: "Coming Soon",
+          description: "Stripe payment integration will be available soon.",
+        });
+        setProcessing(false);
+      }
     } catch (error) {
       console.error("Error processing payment:", error);
       toast({
         title: "Error",
-        description: "Failed to process payment. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to process payment. Please try again.",
         variant: "destructive",
       });
       setProcessing(false);
@@ -174,9 +234,8 @@ export default function Checkout() {
 
       <main className="container mx-auto px-4 py-8 pt-24 max-w-4xl">
         <Button 
-          variant="ghost" 
           onClick={() => navigate(-1)}
-          className="mb-6 text-eka-pearl hover:bg-eka-jade-luxury/20"
+          className="mb-6 bg-eka-jade-luxury/20 hover:bg-eka-jade-luxury/30 text-eka-pearl border border-eka-jade-luxury/30"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
@@ -190,16 +249,19 @@ export default function Checkout() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {items.map((item, index) => (
-                  <div key={index} className="flex justify-between text-eka-champagne">
-                    <span>{item.product.name} x {item.quantity}</span>
-                    <span>${(item.product.price * item.quantity).toLocaleString()}</span>
-                  </div>
-                ))}
+                {items.map((item, index) => {
+                  const price = getProductPrice(item.product, currency) || 0;
+                  return (
+                    <div key={index} className="flex justify-between text-eka-champagne">
+                      <span>{item.product.name} x {item.quantity}</span>
+                      <span>{formatCurrency(price * item.quantity, currency)}</span>
+                    </div>
+                  );
+                })}
                 <div className="border-t border-eka-jade-luxury/30 pt-4">
                   <div className="flex justify-between text-eka-pearl font-bold text-lg">
                     <span>Total</span>
-                    <span>${calculateTotal().toLocaleString()}</span>
+                    <span>{formatCurrency(calculateTotal(), currency)}</span>
                   </div>
                 </div>
               </div>
@@ -211,7 +273,7 @@ export default function Checkout() {
             <CardHeader>
               <CardTitle className="text-eka-pearl">Checkout</CardTitle>
               <CardDescription className="text-eka-champagne">
-                Complete your purchase with Paystack
+                Complete your purchase ({currency})
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -253,7 +315,7 @@ export default function Checkout() {
                   disabled={processing || items.length === 0}
                   className="w-full bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth"
                 >
-                  {processing ? "Processing..." : `Pay $${calculateTotal().toLocaleString()} with Paystack`}
+                  {processing ? "Processing..." : `Pay ${formatCurrency(calculateTotal(), currency)}`}
                 </Button>
               </form>
             </CardContent>

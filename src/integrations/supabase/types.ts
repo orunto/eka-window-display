@@ -248,6 +248,9 @@ export type Database = {
           in_stock: boolean | null
           name: string
           price: number | null
+          price_gbp: number | null
+          price_ngn: number | null
+          price_usd: number | null
           tier: string | null
           updated_at: string | null
         }
@@ -263,6 +266,9 @@ export type Database = {
           in_stock?: boolean | null
           name: string
           price?: number | null
+          price_gbp?: number | null
+          price_ngn?: number | null
+          price_usd?: number | null
           tier?: string | null
           updated_at?: string | null
         }
@@ -278,6 +284,9 @@ export type Database = {
           in_stock?: boolean | null
           name?: string
           price?: number | null
+          price_gbp?: number | null
+          price_ngn?: number | null
+          price_usd?: number | null
           tier?: string | null
           updated_at?: string | null
         }

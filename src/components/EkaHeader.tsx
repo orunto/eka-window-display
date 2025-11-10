@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, User, Check, Package, MapPin, LogOut } from "lucide-react";
+import { Menu, User, Check, Package, MapPin, LogOut, ChevronDown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { LoginModal } from "@/components/LoginModal";
@@ -117,12 +117,13 @@ export const EkaHeader = () => {
                 {user ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-2 bg-eka-jade-luxury/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-eka-golden/30 hover:bg-eka-jade-luxury/30 transition-colors">
+                      <button className="group flex items-center gap-2 bg-eka-jade-luxury/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-eka-golden/30 hover:bg-eka-jade-luxury/30 transition-all duration-300">
                         <Check className="w-4 h-4 text-eka-golden" />
                         <span className="text-sm text-eka-pearl">Welcome {userFirstName}</span>
+                        <ChevronDown className="w-4 h-4 text-eka-golden group-hover:translate-y-0.5 transition-transform" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 bg-eka-emerald-depth/95 backdrop-blur-md border-eka-jade-luxury/30">
+                    <DropdownMenuContent align="end" className="w-48 bg-eka-emerald-depth/95 backdrop-blur-md border-eka-jade-luxury/30 z-50">
                       <DropdownMenuItem 
                         onClick={() => navigate("/profile")}
                         className="text-eka-pearl hover:bg-eka-jade-luxury/20 cursor-pointer"

@@ -16,7 +16,6 @@ import { z } from "zod";
 const productSchema = z.object({
   name: z.string().min(1, "Name is required").max(200, "Name must be less than 200 characters"),
   description: z.string().max(2000, "Description must be less than 2000 characters").optional(),
-  price: z.number().positive("Price must be positive").max(999999, "Price must be less than 1,000,000").optional(),
   tier: z.enum(['A', 'B', 'C'], { required_error: "Tier must be A, B, or C" }),
   gallery_images: z.array(z.string().url("Invalid image URL")).optional(),
 });
@@ -58,7 +57,9 @@ export const ProductsManager = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    price: "",
+    price_ngn: "",
+    price_usd: "",
+    price_gbp: "",
     category_id: "",
     collection_id: "",
     tier: "B" as "A" | "B" | "C",
@@ -144,7 +145,9 @@ export const ProductsManager = () => {
     setFormData({
       name: "",
       description: "",
-      price: "",
+      price_ngn: "",
+      price_usd: "",
+      price_gbp: "",
       category_id: "",
       collection_id: "",
       tier: "B",
@@ -165,7 +168,6 @@ export const ProductsManager = () => {
       const validationData = {
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
-        price: formData.price ? parseFloat(formData.price) : undefined,
         tier: formData.tier,
         gallery_images: formData.gallery_images.length > 0 ? formData.gallery_images : undefined,
       };
@@ -185,7 +187,9 @@ export const ProductsManager = () => {
       const productData = {
         name: validationData.name,
         description: validationData.description || null,
-        price: validationData.price || null,
+        price_ngn: formData.price_ngn ? parseFloat(formData.price_ngn) : null,
+        price_usd: formData.price_usd ? parseFloat(formData.price_usd) : null,
+        price_gbp: formData.price_gbp ? parseFloat(formData.price_gbp) : null,
         category_id: formData.category_id || null,
         collection_id: formData.collection_id || null,
         tier: formData.tier,
@@ -236,7 +240,9 @@ export const ProductsManager = () => {
     setFormData({
       name: product.name,
       description: product.description || "",
-      price: product.price?.toString() || "",
+      price_ngn: (product as any).price_ngn?.toString() || "",
+      price_usd: (product as any).price_usd?.toString() || "",
+      price_gbp: (product as any).price_gbp?.toString() || "",
       category_id: product.category_id || "",
       collection_id: product.collection_id || "",
       tier: product.tier,
@@ -306,13 +312,37 @@ export const ProductsManager = () => {
             </div>
 
             <div>
-              <Label htmlFor="price" className="text-eka-pearl">Price</Label>
+              <Label htmlFor="price_ngn" className="text-eka-pearl">Price (NGN)</Label>
               <Input
-                id="price"
+                id="price_ngn"
                 type="number"
                 step="0.01"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                value={formData.price_ngn}
+                onChange={(e) => setFormData({ ...formData, price_ngn: e.target.value })}
+                className="bg-eka-emerald-depth/20 border-eka-jade-luxury/30 text-eka-pearl"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="price_usd" className="text-eka-pearl">Price (USD)</Label>
+              <Input
+                id="price_usd"
+                type="number"
+                step="0.01"
+                value={formData.price_usd}
+                onChange={(e) => setFormData({ ...formData, price_usd: e.target.value })}
+                className="bg-eka-emerald-depth/20 border-eka-jade-luxury/30 text-eka-pearl"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="price_gbp" className="text-eka-pearl">Price (GBP)</Label>
+              <Input
+                id="price_gbp"
+                type="number"
+                step="0.01"
+                value={formData.price_gbp}
+                onChange={(e) => setFormData({ ...formData, price_gbp: e.target.value })}
                 className="bg-eka-emerald-depth/20 border-eka-jade-luxury/30 text-eka-pearl"
               />
             </div>
