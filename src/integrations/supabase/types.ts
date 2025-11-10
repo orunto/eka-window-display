@@ -82,27 +82,36 @@ export type Database = {
           created_at: string | null
           description: string | null
           featured: boolean | null
+          features: string[] | null
           id: string
           image_url: string | null
           name: string
+          season: string | null
+          tier: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           description?: string | null
           featured?: boolean | null
+          features?: string[] | null
           id?: string
           image_url?: string | null
           name: string
+          season?: string | null
+          tier?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           description?: string | null
           featured?: boolean | null
+          features?: string[] | null
           id?: string
           image_url?: string | null
           name?: string
+          season?: string | null
+          tier?: string | null
           updated_at?: string | null
         }
         Relationships: []

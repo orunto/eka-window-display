@@ -38,6 +38,9 @@ export const CollectionsManager = () => {
     description: '',
     image_url: '',
     featured: false,
+    tier: 'A',
+    season: '',
+    features: ['', '', '', ''],
   });
 
   useEffect(() => {
@@ -91,6 +94,9 @@ export const CollectionsManager = () => {
         description: validationData.description || '',
         image_url: formData.image_url,
         featured: formData.featured,
+        tier: formData.tier,
+        season: formData.season,
+        features: formData.features.filter(f => f.trim() !== ''),
       };
 
       if (editingCollection) {
@@ -137,6 +143,9 @@ export const CollectionsManager = () => {
       description: collection.description || '',
       image_url: collection.image_url || '',
       featured: collection.featured,
+      tier: (collection as any).tier || 'A',
+      season: (collection as any).season || '',
+      features: (collection as any).features || ['', '', '', ''],
     });
     setDialogOpen(true);
   };
@@ -172,6 +181,9 @@ export const CollectionsManager = () => {
       description: '',
       image_url: '',
       featured: false,
+      tier: 'A',
+      season: '',
+      features: ['', '', '', ''],
     });
     setEditingCollection(null);
   };
@@ -224,6 +236,50 @@ export const CollectionsManager = () => {
                 />
               </div>
 
+              <div>
+                <Label htmlFor="tier">Access Tier</Label>
+                <select
+                  id="tier"
+                  value={formData.tier}
+                  onChange={(e) => setFormData({...formData, tier: e.target.value})}
+                  className="w-full px-3 py-2 bg-eka-emerald-depth/20 border border-eka-jade-luxury/30 rounded-md text-eka-pearl"
+                >
+                  <option value="A">Tier A - Public Access</option>
+                  <option value="B">Tier B - Partial Access</option>
+                  <option value="C">Tier C - Restricted (Client Only)</option>
+                </select>
+              </div>
+
+              <div>
+                <Label htmlFor="season">Season/Year</Label>
+                <Input
+                  id="season"
+                  value={formData.season}
+                  onChange={(e) => setFormData({...formData, season: e.target.value})}
+                  placeholder="e.g., Spring/Summer 2025"
+                  className="bg-eka-emerald-depth/20 border-eka-jade-luxury/30"
+                />
+              </div>
+
+              <div>
+                <Label>Collection Features (up to 4)</Label>
+                <div className="space-y-2">
+                  {formData.features.map((feature, index) => (
+                    <Input
+                      key={index}
+                      value={feature}
+                      onChange={(e) => {
+                        const newFeatures = [...formData.features];
+                        newFeatures[index] = e.target.value;
+                        setFormData({...formData, features: newFeatures});
+                      }}
+                      placeholder={`Feature ${index + 1}`}
+                      className="bg-eka-emerald-depth/20 border-eka-jade-luxury/30"
+                    />
+                  ))}
+                </div>
+              </div>
+
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"
@@ -273,10 +329,10 @@ export const CollectionsManager = () => {
               <TableHeader>
                 <TableRow className="border-eka-jade-luxury/30">
                   <TableHead className="text-eka-champagne">Name</TableHead>
-                  <TableHead className="text-eka-champagne">Description</TableHead>
+                  <TableHead className="text-eka-champagne">Tier</TableHead>
+                  <TableHead className="text-eka-champagne">Season</TableHead>
                   <TableHead className="text-eka-champagne">Image</TableHead>
                   <TableHead className="text-eka-champagne">Featured</TableHead>
-                  <TableHead className="text-eka-champagne">Created</TableHead>
                   <TableHead className="text-eka-champagne">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -284,7 +340,18 @@ export const CollectionsManager = () => {
                 {collections.map((collection) => (
                   <TableRow key={collection.id} className="border-eka-jade-luxury/20">
                     <TableCell className="text-eka-pearl font-medium">{collection.name}</TableCell>
-                    <TableCell className="text-eka-pearl">{collection.description || 'N/A'}</TableCell>
+                    <TableCell className="text-eka-pearl">
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        (collection as any).tier === 'C' 
+                          ? 'bg-red-500/20 text-red-300' 
+                          : (collection as any).tier === 'B'
+                          ? 'bg-yellow-500/20 text-yellow-300'
+                          : 'bg-green-500/20 text-green-300'
+                      }`}>
+                        Tier {(collection as any).tier || 'A'}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-eka-pearl">{(collection as any).season || 'N/A'}</TableCell>
                     <TableCell className="text-eka-pearl">
                       {collection.image_url ? (
                         <img src={collection.image_url} alt={collection.name} className="w-12 h-12 object-cover rounded" />
@@ -294,9 +361,6 @@ export const CollectionsManager = () => {
                     </TableCell>
                     <TableCell className="text-eka-pearl">
                       {collection.featured ? 'Yes' : 'No'}
-                    </TableCell>
-                    <TableCell className="text-eka-pearl">
-                      {new Date(collection.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">

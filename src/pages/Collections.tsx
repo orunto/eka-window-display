@@ -135,22 +135,22 @@ const Collections = () => {
                     {/* Collection Features */}
                     <div className="bg-gradient-to-br from-eka-golden/10 to-eka-champagne/5 border border-eka-golden/30 rounded-2xl p-8 space-y-6 backdrop-blur-sm">
                       <h3 className="text-2xl font-semibold text-eka-golden">
-                        {!user ? "Sign in to view exclusive collections" : "Collection Features"}
+                        {collection.tier === "C" && !user ? "Sign in to view exclusive collections" : "Collection Features"}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {!user ? (
+                        {collection.tier === "C" && !user ? (
                           <>
                             <div className="flex items-center gap-3">
-                              <div className="w-3 h-3 bg-eka-golden rounded-full animate-pulse" />
-                              <span className="text-eka-pearl">Heritage craftsmanship</span>
+                              <Lock className="w-3 h-3 text-eka-golden" />
+                              <span className="text-eka-pearl">Restricted Access</span>
                             </div>
                             <div className="flex items-center gap-3">
-                              <div className="w-3 h-3 bg-eka-golden rounded-full animate-pulse animation-delay-200" />
-                              <span className="text-eka-pearl">Sustainable luxury</span>
+                              <Lock className="w-3 h-3 text-eka-golden" />
+                              <span className="text-eka-pearl">Client Only</span>
                             </div>
                           </>
                         ) : (
-                          ['Heritage craftsmanship', 'Sustainable luxury', 'Limited production', 'Custom tailoring'].map((feature, i) => (
+                          ((collection as any).features || ['Heritage craftsmanship', 'Sustainable luxury', 'Limited production', 'Custom tailoring']).map((feature: string, i: number) => (
                             <div key={i} className="flex items-center gap-3">
                               <div className="w-3 h-3 bg-eka-golden rounded-full animate-pulse" style={{animationDelay: `${i * 200}ms`}} />
                               <span className="text-eka-pearl">{feature}</span>
@@ -168,9 +168,24 @@ const Collections = () => {
                         <img 
                           src={collection.image_url || 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=800&fit=crop'}
                           alt={collection.name}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${
+                            collection.tier === "C" && !user ? "blur-md" : ""
+                          }`}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-eka-emerald-depth/30 via-transparent to-transparent" />
+                        
+                        {/* Restricted Overlay */}
+                        {collection.tier === "C" && !user && (
+                          <div className="absolute inset-0 bg-eka-emerald-depth/40 flex items-center justify-center">
+                            <div className="text-center text-eka-pearl space-y-3">
+                              <Lock className="w-12 h-12 mx-auto" />
+                              <div className="space-y-1">
+                                <p className="text-lg font-semibold">Exclusive Collection</p>
+                                <p className="text-sm opacity-90">Client Access Required</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       
                       {/* Decorative elements */}
