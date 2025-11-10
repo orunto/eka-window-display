@@ -9,21 +9,38 @@ import { LoginModal } from "@/components/LoginModal";
 import { ArrowLeft, Lock, ShoppingBag, Heart, X } from "lucide-react";
 import { useProduct, useProducts } from "@/hooks/useProducts";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProfile } from "@/hooks/useProfile";
+import { useProductVariants } from "@/hooks/useProductVariants";
 import { slugify } from "@/utils/slugify";
 
 const ProductDetails = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { profile } = useProfile();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageViewOpen, setIsImageViewOpen] = useState(false);
-  const [showPriceInfo, setShowPriceInfo] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
 
   const { product, loading } = useProduct(slug);
+  const { variants } = useProductVariants(product?.id);
   const { products: relatedProducts } = useProducts({
     collectionId: product?.collection_id || undefined,
   });
+
+  // Determine access level based on user tier vs product tier
+  const getTierLevel = (tier: string | null): number => {
+    if (tier === 'A') return 3;
+    if (tier === 'B') return 2;
+    if (tier === 'C') return 1;
+    return 0;
+  };
+
+  const userTierLevel = getTierLevel(profile?.tier || null);
+  const productTierLevel = getTierLevel(product?.tier || null);
+  const hasFullAccess = userTierLevel >= productTierLevel;
+  const hasLimitedAccess = userTierLevel === productTierLevel - 1;
 
   useEffect(() => {
     // Scroll to top when component mounts
@@ -86,15 +103,12 @@ const ProductDetails = () => {
   };
 
   const getTierBadge = () => {
-    switch (product.tier) {
-      case "A":
-        return <Badge variant="secondary" className="bg-golden-grace text-white text-xs sm:text-sm">Full Access</Badge>;
-      case "B":
-        return <Badge variant="outline" className="border-serene-sage text-xs sm:text-sm">Limited View</Badge>;
-      case "C":
-        return <Badge variant="destructive" className="bg-obsidian-depth text-xs sm:text-sm">Restricted</Badge>;
-      default:
-        return null;
+    if (hasFullAccess) {
+      return <Badge variant="secondary" className="bg-golden-grace text-white text-xs sm:text-sm">Full Access</Badge>;
+    } else if (hasLimitedAccess) {
+      return <Badge variant="outline" className="border-serene-sage text-xs sm:text-sm">Limited View</Badge>;
+    } else {
+      return <Badge variant="destructive" className="bg-obsidian-depth text-xs sm:text-sm">Restricted</Badge>;
     }
   };
 
@@ -185,27 +199,53 @@ const ProductDetails = () => {
             </div>
 
             {/* Price */}
-            {product.tier === "A" && product.price && (
+            {hasFullAccess && product.price && (
               <div className="text-xl sm:text-2xl font-bold text-eka-pearl">
                 ${product.price.toLocaleString()}
               </div>
             )}
 
-            {product.tier === "B" && (
+            {hasLimitedAccess && (
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                 <div className="text-xl sm:text-2xl font-bold text-eka-pearl blur-sm select-none">
                   $XX,XXX
                 </div>
-                <div 
-                  className="flex items-center gap-2 text-eka-champagne cursor-pointer hover:text-eka-golden transition-colors touch-manipulation"
-                  onClick={() => setShowPriceInfo(!showPriceInfo)}
-                  onTouchStart={() => setShowPriceInfo(true)}
-                  onTouchEnd={() => setTimeout(() => setShowPriceInfo(false), 2000)}
-                >
+                <div className="flex items-center gap-2 text-eka-champagne">
                   <Lock className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                   <span className="text-sm bg-eka-jade-luxury/60 backdrop-blur-sm px-3 py-1 rounded-md border border-eka-jade-luxury/30">
-                    Price available to clients
+                    Price available to higher tier clients
                   </span>
+                </div>
+              </div>
+            )}
+
+            {/* Product Variants */}
+            {hasFullAccess && variants.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-base sm:text-lg font-semibold text-eka-pearl">Available Options</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {variants.map((variant) => (
+                    <button
+                      key={variant.id}
+                      onClick={() => setSelectedVariant(variant.id)}
+                      className={`p-3 rounded-lg border transition-all duration-200 text-left touch-manipulation ${
+                        selectedVariant === variant.id
+                          ? 'border-eka-golden bg-eka-golden/10 text-eka-pearl'
+                          : 'border-eka-jade-luxury/30 bg-eka-jade-luxury/10 text-eka-champagne hover:border-eka-jade-luxury'
+                      }`}
+                    >
+                      <div className="text-sm font-medium">{variant.name}</div>
+                      <div className="text-xs text-eka-champagne mt-1">{variant.type}</div>
+                      {variant.price_adjustment !== 0 && (
+                        <div className="text-xs text-eka-golden mt-1">
+                          {variant.price_adjustment > 0 ? '+' : ''}${variant.price_adjustment}
+                        </div>
+                      )}
+                      {variant.stock_quantity <= 5 && variant.stock_quantity > 0 && (
+                        <div className="text-xs text-serene-sage mt-1">Only {variant.stock_quantity} left</div>
+                      )}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
@@ -213,8 +253,8 @@ const ProductDetails = () => {
             {/* Description */}
             <div className="space-y-3 sm:space-y-4">
               <h3 className="text-base sm:text-lg font-semibold text-eka-pearl">Description</h3>
-              <p className="text-sm sm:text-base text-eka-champagne leading-relaxed">
-                {product.description}
+              <p className={`text-sm sm:text-base text-eka-champagne leading-relaxed ${!hasFullAccess && !hasLimitedAccess ? 'blur-sm select-none' : ''}`}>
+                {hasFullAccess || hasLimitedAccess ? product.description : 'Detailed product information available to clients with appropriate access level.'}
               </p>
             </div>
 
@@ -224,10 +264,11 @@ const ProductDetails = () => {
                 variant="exclusive" 
                 className="flex-1 bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth text-sm sm:text-base min-h-[44px] touch-manipulation"
                 onClick={handlePurchaseClick}
+                disabled={!hasFullAccess}
               >
                 <ShoppingBag className="w-4 h-4 mr-2 flex-shrink-0" />
                 <span className="text-center">
-                  {user && product.tier === "A" ? "Buy Now" : "Purchase - Client Login Required"}
+                  {hasFullAccess ? "Buy Now" : "Purchase - Higher Tier Required"}
                 </span>
               </Button>
               
