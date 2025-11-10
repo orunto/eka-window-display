@@ -95,9 +95,7 @@ export const EkaFooter = () => {
                 <a href="/bespoke" className="block text-eka-champagne hover:text-eka-golden transition-colors duration-300 text-lg">
                   Bespoke
                 </a>
-                <a href="/dashboard" className="block text-eka-champagne hover:text-eka-golden transition-colors duration-300 text-lg">
-                  Dashboard
-                </a>
+                
                 <a href="/register" className="block text-eka-champagne hover:text-eka-golden transition-colors duration-300 text-lg">
                   Become a Client
                 </a>
