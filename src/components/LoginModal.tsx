@@ -105,22 +105,9 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md w-[95vw] max-h-[90vh] overflow-y-auto bg-eka-emerald-depth/95 backdrop-blur-md border-eka-jade-luxury/30 text-eka-pearl p-4 sm:p-6">
         <DialogHeader className="space-y-3">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl sm:text-2xl font-heading text-eka-golden">
-              {showApplication ? "Apply as EKA Client" : "Access EKA"}
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                setShowApplication(false);
-                onClose();
-              }}
-              className="text-eka-pearl hover:bg-eka-jade-luxury/20 min-h-[40px] min-w-[40px] touch-manipulation"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <DialogTitle className="text-xl sm:text-2xl font-heading text-eka-golden">
+            {showApplication ? "Apply as EKA Client" : "Access EKA"}
+          </DialogTitle>
           <p className="text-sm sm:text-base text-eka-champagne leading-relaxed">
             {showApplication 
               ? "Complete the application form to become an EKA client."

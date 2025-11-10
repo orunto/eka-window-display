@@ -8,11 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { LoginModal } from "@/components/LoginModal";
 import { ArrowLeft, Lock, ShoppingBag, Heart, X } from "lucide-react";
 import { useProduct, useProducts } from "@/hooks/useProducts";
+import { useAuth } from "@/contexts/AuthContext";
 import { slugify } from "@/utils/slugify";
 
 const ProductDetails = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageViewOpen, setIsImageViewOpen] = useState(false);
@@ -76,7 +78,11 @@ const ProductDetails = () => {
     .slice(0, 4);
 
   const handlePurchaseClick = () => {
-    setIsLoginOpen(true);
+    if (!user) {
+      setIsLoginOpen(true);
+    } else {
+      navigate("/checkout", { state: { items: [{ product, quantity: 1 }] } });
+    }
   };
 
   const getTierBadge = () => {
@@ -217,17 +223,11 @@ const ProductDetails = () => {
               <Button 
                 variant="exclusive" 
                 className="flex-1 bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth text-sm sm:text-base min-h-[44px] touch-manipulation"
-                onClick={() => {
-                  if (product.tier === "A" && product.price) {
-                    navigate("/checkout", { state: { items: [{ product, quantity: 1 }] } });
-                  } else {
-                    handlePurchaseClick();
-                  }
-                }}
+                onClick={handlePurchaseClick}
               >
                 <ShoppingBag className="w-4 h-4 mr-2 flex-shrink-0" />
                 <span className="text-center">
-                  {product.tier === "A" ? "Buy Now" : "Purchase - Client Login Required"}
+                  {user && product.tier === "A" ? "Buy Now" : "Purchase - Client Login Required"}
                 </span>
               </Button>
               
