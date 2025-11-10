@@ -5,11 +5,14 @@ import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
-import { mockProducts, mockCollections } from "@/data/mockData";
+import { useCollection } from "@/hooks/useCollections";
+import { useProducts } from "@/hooks/useProducts";
 
 const CollectionDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { collection, loading: collectionLoading } = useCollection(id);
+  const { products, loading: productsLoading } = useProducts({ collectionId: id });
 
   useEffect(() => {
     // Load fonts
@@ -27,7 +30,16 @@ const CollectionDetails = () => {
     loadFonts();
   }, []);
 
-  const collection = mockCollections.find(c => c.id === id);
+  if (collectionLoading || productsLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <EkaHeader />
+        <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28">
+          <p>Loading collection...</p>
+        </div>
+      </div>
+    );
+  }
   
   if (!collection) {
     return (
@@ -39,8 +51,6 @@ const CollectionDetails = () => {
       </div>
     );
   }
-
-  const collectionProducts = mockProducts.filter(p => p.collection === collection.name);
 
   const getTierBadge = () => {
     switch (collection.tier) {
@@ -112,17 +122,25 @@ const CollectionDetails = () => {
                   Collection Highlights
                 </h3>
                 <ul className="space-y-2 text-muted-foreground">
-                  <li>• {collection.productCount} exclusive pieces</li>
+                  <li>• {products.length} exclusive pieces</li>
                   <li>• Handcrafted with sustainable luxury materials</li>
                   <li>• Limited production run</li>
                   <li>• Custom sizing available for select pieces</li>
                 </ul>
               </div>
+              
+              {collection.tier === "B" && (
+                <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                  <p className="text-sm text-yellow-800">
+                    <strong>Note:</strong> This collection contains some pieces that require client access to view full details.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="aspect-[4/3] rounded-lg overflow-hidden">
               <img 
-                src={collection.image} 
+                src={collection.image_url || 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=800&fit=crop'} 
                 alt={collection.name}
                 className="w-full h-full object-cover"
               />
@@ -143,12 +161,26 @@ const CollectionDetails = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {collectionProducts.map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product}
-              />
-            ))}
+            {products.length > 0 ? (
+              products.map((product) => (
+                <ProductCard 
+                  key={product.id} 
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    image: product.image_url || '',
+                    price: product.price || 0,
+                    category: '',
+                    tier: (product.tier || 'B') as 'A' | 'B' | 'C',
+                    description: product.description || '',
+                  }}
+                />
+              ))
+            ) : (
+              <p className="col-span-full text-center text-muted-foreground py-8">
+                No products available in this collection yet.
+              </p>
+            )}
           </div>
         </div>
       </div>

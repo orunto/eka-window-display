@@ -39,22 +39,25 @@ export const CollectionCard = ({ collection, onClick }: CollectionCardProps) => 
         return {
           badge: <Badge className="bg-golden-grace text-white">Full Collection</Badge>,
           description: "View all pieces in this exclusive collection",
-          blur: false
+          blur: false,
+          label: "Public Access"
         };
       case "B":
         return {
           badge: <Badge variant="outline" className="border-serene-sage">Partial Access</Badge>,
-          description: "Limited preview - Client access for full collection",
-          blur: false
+          description: "Some pieces require client access",
+          blur: false,
+          label: "Partially Restricted"
         };
       case "C":
         return {
           badge: <Badge variant="destructive" className="bg-obsidian-depth">Client Only</Badge>,
           description: "Exclusive collection for Eka clients",
-          blur: true
+          blur: true,
+          label: "Client Exclusive"
         };
       default:
-        return { badge: null, description: "", blur: false };
+        return { badge: null, description: "", blur: false, label: "" };
     }
   };
 

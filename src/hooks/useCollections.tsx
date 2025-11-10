@@ -8,8 +8,8 @@ export interface Collection {
   image_url: string | null;
   featured: boolean | null;
   created_at: string | null;
-  tier?: string;
-  season?: string;
+  tier: "A" | "B" | "C";
+  season: string | null;
 }
 
 export const useCollections = (filters?: { featured?: boolean }) => {
@@ -30,7 +30,10 @@ export const useCollections = (filters?: { featured?: boolean }) => {
         const { data, error: fetchError } = await query.order('created_at', { ascending: false });
 
         if (fetchError) throw fetchError;
-        setCollections(data || []);
+        setCollections((data || []).map(c => ({
+          ...c,
+          tier: (c.tier || 'A') as 'A' | 'B' | 'C'
+        })));
       } catch (err) {
         setError(err as Error);
         console.error('Error fetching collections:', err);
@@ -66,7 +69,10 @@ export const useCollection = (id: string | undefined) => {
           .single();
 
         if (fetchError) throw fetchError;
-        setCollection(data);
+        setCollection(data ? {
+          ...data,
+          tier: (data.tier || 'A') as 'A' | 'B' | 'C'
+        } : null);
       } catch (err) {
         setError(err as Error);
         console.error('Error fetching collection:', err);

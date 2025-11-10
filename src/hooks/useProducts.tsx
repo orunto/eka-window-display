@@ -7,6 +7,9 @@ export interface Product {
   name: string;
   description: string | null;
   price: number | null;
+  price_ngn: number | null;
+  price_usd: number | null;
+  price_gbp: number | null;
   tier: string | null;
   image_url: string | null;
   gallery_images: string[] | null;

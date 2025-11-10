@@ -119,6 +119,12 @@ const Collections = () => {
                         }
                       </p>
                       
+                      {collection.tier === "B" && (
+                        <p className="text-sm text-eka-golden border-l-2 border-eka-golden pl-4">
+                          Note: This collection contains some pieces that require client access
+                        </p>
+                      )}
+                      
                       <div className="flex items-center justify-between pt-6 border-t border-eka-jade-luxury/30">
                         <div className="flex items-center space-x-4">
                           <div className="w-2 h-2 bg-eka-golden rounded-full animate-pulse" />
