@@ -15,7 +15,10 @@ import CollectionDetails from "./pages/CollectionDetails";
 import CategoryDetails from "./pages/CategoryDetails";
 import Admin from "./pages/Admin";
 import Register from "./pages/Register";
-import ClientDashboard from "./pages/ClientDashboard";
+import Profile from "./pages/Profile";
+import Orders from "./pages/Orders";
+import Delivery from "./pages/Delivery";
+import Checkout from "./pages/Checkout";
 import Bespoke from "./pages/Bespoke";
 
 const queryClient = new QueryClient();
@@ -38,7 +41,10 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<ClientDashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/delivery" element={<Delivery />} />
+            <Route path="/checkout" element={<Checkout />} />
             <Route path="/bespoke" element={<Bespoke />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

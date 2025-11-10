@@ -3,10 +3,17 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Check } from "lucide-react";
+import { Menu, User, Check, Package, MapPin, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { LoginModal } from "@/components/LoginModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const EkaHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -108,27 +115,45 @@ export const EkaHeader = () => {
             {!loading && (
               <div className="hidden sm:flex items-center gap-3">
                 {user ? (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      onClick={() => navigate("/dashboard")}
-                      variant="ghost"
-                      className="text-eka-pearl hover:text-eka-golden"
-                    >
-                      Dashboard
-                    </Button>
-                    <div className="flex items-center gap-2 bg-eka-jade-luxury/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-eka-golden/30">
-                      <Check className="w-4 h-4 text-eka-golden" />
-                      <span className="text-sm text-eka-pearl">Welcome {userFirstName}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleSignOut}
-                        className="text-eka-champagne hover:text-eka-golden text-xs px-2 py-1 h-auto"
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="flex items-center gap-2 bg-eka-jade-luxury/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-eka-golden/30 hover:bg-eka-jade-luxury/30 transition-colors">
+                        <Check className="w-4 h-4 text-eka-golden" />
+                        <span className="text-sm text-eka-pearl">Welcome {userFirstName}</span>
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 bg-eka-emerald-depth/95 backdrop-blur-md border-eka-jade-luxury/30">
+                      <DropdownMenuItem 
+                        onClick={() => navigate("/profile")}
+                        className="text-eka-pearl hover:bg-eka-jade-luxury/20 cursor-pointer"
                       >
+                        <User className="w-4 h-4 mr-2" />
+                        Profile
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => navigate("/orders")}
+                        className="text-eka-pearl hover:bg-eka-jade-luxury/20 cursor-pointer"
+                      >
+                        <Package className="w-4 h-4 mr-2" />
+                        Order History
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => navigate("/delivery")}
+                        className="text-eka-pearl hover:bg-eka-jade-luxury/20 cursor-pointer"
+                      >
+                        <MapPin className="w-4 h-4 mr-2" />
+                        Delivery Information
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator className="bg-eka-jade-luxury/30" />
+                      <DropdownMenuItem 
+                        onClick={handleSignOut}
+                        className="text-eka-champagne hover:bg-eka-jade-luxury/20 hover:text-red-400 cursor-pointer"
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
                         Sign Out
-                      </Button>
-                    </div>
-                  </div>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
                   <Button
                     onClick={() => setIsLoginModalOpen(true)}
@@ -166,19 +191,32 @@ export const EkaHeader = () => {
                             <span className="text-sm font-medium">Welcome {userFirstName}</span>
                           </div>
                           <Button
-                            onClick={() => {
-                              handleNavigation("/dashboard");
-                            }}
-                            className="w-full bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth min-h-[44px] touch-manipulation"
+                            onClick={() => handleNavigation("/profile")}
+                            className="w-full bg-eka-jade-luxury/20 hover:bg-eka-jade-luxury/30 text-eka-pearl min-h-[44px] touch-manipulation justify-start"
                           >
-                            My Dashboard
+                            <User className="w-4 h-4 mr-2" />
+                            Profile
+                          </Button>
+                          <Button
+                            onClick={() => handleNavigation("/orders")}
+                            className="w-full bg-eka-jade-luxury/20 hover:bg-eka-jade-luxury/30 text-eka-pearl min-h-[44px] touch-manipulation justify-start"
+                          >
+                            <Package className="w-4 h-4 mr-2" />
+                            Order History
+                          </Button>
+                          <Button
+                            onClick={() => handleNavigation("/delivery")}
+                            className="w-full bg-eka-jade-luxury/20 hover:bg-eka-jade-luxury/30 text-eka-pearl min-h-[44px] touch-manipulation justify-start"
+                          >
+                            <MapPin className="w-4 h-4 mr-2" />
+                            Delivery Information
                           </Button>
                           <Button
                             variant="outline"
-                            size="sm"
                             onClick={handleSignOut}
-                            className="w-full border-eka-jade-luxury/30 text-eka-champagne hover:bg-eka-jade-luxury/20 min-h-[44px] touch-manipulation"
+                            className="w-full border-eka-jade-luxury/30 text-eka-champagne hover:bg-eka-jade-luxury/20 hover:text-red-400 min-h-[44px] touch-manipulation justify-start"
                           >
+                            <LogOut className="w-4 h-4 mr-2" />
                             Sign Out
                           </Button>
                         </div>
