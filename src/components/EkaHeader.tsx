@@ -12,9 +12,28 @@ export const EkaHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [userFirstName, setUserFirstName] = useState<string>("");
   const navigate = useNavigate();
   const location = useLocation();
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", user.id)
+          .single();
+        
+        if (data?.full_name) {
+          const firstName = data.full_name.split(' ')[0];
+          setUserFirstName(firstName);
+        }
+      }
+    };
+    fetchUserProfile();
+  }, [user]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -99,7 +118,7 @@ export const EkaHeader = () => {
                     </Button>
                     <div className="flex items-center gap-2 bg-eka-jade-luxury/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-eka-golden/30">
                       <Check className="w-4 h-4 text-eka-golden" />
-                      <span className="text-sm text-eka-pearl">Client</span>
+                      <span className="text-sm text-eka-pearl">Welcome {userFirstName}</span>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -144,7 +163,7 @@ export const EkaHeader = () => {
                         <div className="space-y-3">
                           <div className="flex items-center gap-2 text-eka-golden">
                             <Check className="w-4 h-4" />
-                            <span className="text-sm font-medium">Signed in as Client</span>
+                            <span className="text-sm font-medium">Welcome {userFirstName}</span>
                           </div>
                           <Button
                             onClick={() => {

@@ -9,8 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, User, MapPin } from "lucide-react";
+import { Package, User, MapPin, LogOut } from "lucide-react";
+import { SidebarProvider, Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 
 interface Profile {
   id: string;
@@ -35,6 +35,7 @@ export default function ClientDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [activeView, setActiveView] = useState<"profile" | "orders" | "delivery">("profile");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -83,6 +84,11 @@ export default function ClientDashboard() {
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
   };
 
   const updateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -158,164 +164,193 @@ export default function ClientDashboard() {
     );
   }
 
+  const menuItems = [
+    { id: "profile" as const, label: "Profile", icon: User },
+    { id: "orders" as const, label: "Order History", icon: Package },
+    { id: "delivery" as const, label: "Delivery Information", icon: MapPin },
+  ];
+
+  const renderContent = () => {
+    switch (activeView) {
+      case "profile":
+        return (
+          <Card className="bg-eka-emerald-depth/40 border-eka-jade-luxury/30">
+            <CardHeader>
+              <CardTitle className="text-eka-pearl">Profile Information</CardTitle>
+              <CardDescription className="text-eka-champagne">
+                Update your personal information
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={updateProfile} className="space-y-4">
+                <div>
+                  <Label htmlFor="email" className="text-eka-pearl">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={profile?.email || ""}
+                    disabled
+                    className="bg-eka-emerald-depth/60 border-eka-jade-luxury/30 text-eka-champagne"
+                  />
+                  <p className="text-sm text-eka-champagne/60 mt-1">Email cannot be changed</p>
+                </div>
+                <div>
+                  <Label htmlFor="full_name" className="text-eka-pearl">Full Name</Label>
+                  <Input
+                    id="full_name"
+                    name="full_name"
+                    defaultValue={profile?.full_name || ""}
+                    className="bg-eka-emerald-depth/60 border-eka-jade-luxury/30 text-eka-pearl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone_number" className="text-eka-pearl">Phone Number</Label>
+                  <Input
+                    id="phone_number"
+                    name="phone_number"
+                    defaultValue={profile?.phone_number || ""}
+                    className="bg-eka-emerald-depth/60 border-eka-jade-luxury/30 text-eka-pearl"
+                  />
+                </div>
+                <Button type="submit" disabled={saving} className="bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth">
+                  {saving ? "Saving..." : "Save Changes"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        );
+
+      case "orders":
+        return (
+          <Card className="bg-eka-emerald-depth/40 border-eka-jade-luxury/30">
+            <CardHeader>
+              <CardTitle className="text-eka-pearl">Order History</CardTitle>
+              <CardDescription className="text-eka-champagne">
+                View your past and current orders
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {orders.length === 0 ? (
+                <div className="text-center py-12">
+                  <Package className="h-16 w-16 mx-auto text-eka-champagne/40 mb-4" />
+                  <p className="text-eka-champagne text-lg">No orders yet</p>
+                  <p className="text-eka-champagne/60 mt-2">Start shopping to see your orders here</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {orders.map((order) => (
+                    <div
+                      key={order.id}
+                      className="border border-eka-jade-luxury/30 rounded-lg p-4 bg-eka-emerald-depth/20"
+                    >
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                          <p className="text-eka-pearl font-semibold">
+                            Order #{order.id.slice(0, 8)}
+                          </p>
+                          <p className="text-eka-champagne text-sm mt-1">
+                            {formatDate(order.created_at)}
+                          </p>
+                        </div>
+                        <div className="flex flex-col md:items-end gap-2">
+                          <p className="text-eka-pearl font-semibold">
+                            {formatCurrency(Number(order.total_amount))}
+                          </p>
+                          <p className={`text-sm font-medium capitalize ${getStatusColor(order.status)}`}>
+                            {order.status}
+                          </p>
+                        </div>
+                      </div>
+                      {order.shipping_address && (
+                        <div className="mt-3 pt-3 border-t border-eka-jade-luxury/20">
+                          <p className="text-eka-champagne text-sm">
+                            <span className="font-semibold">Shipping to:</span> {order.shipping_address}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        );
+
+      case "delivery":
+        return (
+          <Card className="bg-eka-emerald-depth/40 border-eka-jade-luxury/30">
+            <CardHeader>
+              <CardTitle className="text-eka-pearl">Delivery Address</CardTitle>
+              <CardDescription className="text-eka-champagne">
+                Update your default delivery address
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={updateProfile} className="space-y-4">
+                <div>
+                  <Label htmlFor="delivery_address" className="text-eka-pearl">Address</Label>
+                  <Textarea
+                    id="delivery_address"
+                    name="delivery_address"
+                    defaultValue={profile?.delivery_address || ""}
+                    rows={4}
+                    placeholder="Enter your full delivery address including street, city, state, and postal code"
+                    className="bg-eka-emerald-depth/60 border-eka-jade-luxury/30 text-eka-pearl"
+                  />
+                </div>
+                <Button type="submit" disabled={saving} className="bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth">
+                  {saving ? "Saving..." : "Save Address"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        );
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
       <EkaHeader />
 
-      <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28 relative z-10 max-w-6xl">
-        <div className="mb-8">
-          <h1 className="text-4xl font-heading text-eka-pearl mb-2">My Dashboard</h1>
-          <p className="text-eka-champagne">Manage your profile and view order history</p>
-        </div>
-
-        <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-eka-emerald-depth/40 mb-8">
-            <TabsTrigger value="profile" className="data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
-              <User className="h-4 w-4 mr-2" />
-              Profile
-            </TabsTrigger>
-            <TabsTrigger value="orders" className="data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
-              <Package className="h-4 w-4 mr-2" />
-              Orders
-            </TabsTrigger>
-            <TabsTrigger value="delivery" className="data-[state=active]:bg-eka-golden data-[state=active]:text-eka-emerald-depth">
-              <MapPin className="h-4 w-4 mr-2" />
-              Delivery
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="profile">
-            <Card className="bg-eka-emerald-depth/40 border-eka-jade-luxury/30">
-              <CardHeader>
-                <CardTitle className="text-eka-pearl">Profile Information</CardTitle>
-                <CardDescription className="text-eka-champagne">
-                  Update your personal information
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={updateProfile} className="space-y-4">
-                  <div>
-                    <Label htmlFor="email" className="text-eka-pearl">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={profile?.email || ""}
-                      disabled
-                      className="bg-eka-emerald-depth/60 border-eka-jade-luxury/30 text-eka-champagne"
-                    />
-                    <p className="text-sm text-eka-champagne/60 mt-1">Email cannot be changed</p>
-                  </div>
-                  <div>
-                    <Label htmlFor="full_name" className="text-eka-pearl">Full Name</Label>
-                    <Input
-                      id="full_name"
-                      name="full_name"
-                      defaultValue={profile?.full_name || ""}
-                      className="bg-eka-emerald-depth/60 border-eka-jade-luxury/30 text-eka-pearl"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="phone_number" className="text-eka-pearl">Phone Number</Label>
-                    <Input
-                      id="phone_number"
-                      name="phone_number"
-                      defaultValue={profile?.phone_number || ""}
-                      className="bg-eka-emerald-depth/60 border-eka-jade-luxury/30 text-eka-pearl"
-                    />
-                  </div>
-                  <Button type="submit" disabled={saving} className="bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth">
-                    {saving ? "Saving..." : "Save Changes"}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="orders">
-            <Card className="bg-eka-emerald-depth/40 border-eka-jade-luxury/30">
-              <CardHeader>
-                <CardTitle className="text-eka-pearl">Order History</CardTitle>
-                <CardDescription className="text-eka-champagne">
-                  View your past and current orders
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {orders.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Package className="h-16 w-16 mx-auto text-eka-champagne/40 mb-4" />
-                    <p className="text-eka-champagne text-lg">No orders yet</p>
-                    <p className="text-eka-champagne/60 mt-2">Start shopping to see your orders here</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {orders.map((order) => (
-                      <div
-                        key={order.id}
-                        className="border border-eka-jade-luxury/30 rounded-lg p-4 bg-eka-emerald-depth/20"
-                      >
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                          <div>
-                            <p className="text-eka-pearl font-semibold">
-                              Order #{order.id.slice(0, 8)}
-                            </p>
-                            <p className="text-eka-champagne text-sm mt-1">
-                              {formatDate(order.created_at)}
-                            </p>
-                          </div>
-                          <div className="flex flex-col md:items-end gap-2">
-                            <p className="text-eka-pearl font-semibold">
-                              {formatCurrency(Number(order.total_amount))}
-                            </p>
-                            <p className={`text-sm font-medium capitalize ${getStatusColor(order.status)}`}>
-                              {order.status}
-                            </p>
-                          </div>
-                        </div>
-                        {order.shipping_address && (
-                          <div className="mt-3 pt-3 border-t border-eka-jade-luxury/20">
-                            <p className="text-eka-champagne text-sm">
-                              <span className="font-semibold">Shipping to:</span> {order.shipping_address}
-                            </p>
-                          </div>
-                        )}
-                      </div>
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full pt-16">
+          <Sidebar className="border-eka-jade-luxury/30">
+            <SidebarContent className="bg-eka-emerald-depth/40 backdrop-blur-xl">
+              <SidebarGroup className="py-8 px-2">
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    {menuItems.map((item) => (
+                      <SidebarMenuItem key={item.id}>
+                        <SidebarMenuButton
+                          onClick={() => setActiveView(item.id)}
+                          isActive={activeView === item.id}
+                          className="text-eka-pearl hover:bg-eka-jade-luxury/20 data-[active=true]:bg-eka-golden data-[active=true]:text-eka-emerald-depth"
+                        >
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.label}</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
                     ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        onClick={handleSignOut}
+                        className="text-eka-pearl hover:bg-eka-jade-luxury/20 hover:text-red-400"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Sign Out</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
 
-          <TabsContent value="delivery">
-            <Card className="bg-eka-emerald-depth/40 border-eka-jade-luxury/30">
-              <CardHeader>
-                <CardTitle className="text-eka-pearl">Delivery Address</CardTitle>
-                <CardDescription className="text-eka-champagne">
-                  Update your default delivery address
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={updateProfile} className="space-y-4">
-                  <div>
-                    <Label htmlFor="delivery_address" className="text-eka-pearl">Address</Label>
-                    <Textarea
-                      id="delivery_address"
-                      name="delivery_address"
-                      defaultValue={profile?.delivery_address || ""}
-                      rows={4}
-                      placeholder="Enter your full delivery address including street, city, state, and postal code"
-                      className="bg-eka-emerald-depth/60 border-eka-jade-luxury/30 text-eka-pearl"
-                    />
-                  </div>
-                  <Button type="submit" disabled={saving} className="bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth">
-                    {saving ? "Saving..." : "Save Address"}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+          <main className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
+            {renderContent()}
+          </main>
+        </div>
+      </SidebarProvider>
 
       <EkaFooter />
     </div>
