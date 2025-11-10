@@ -38,15 +38,15 @@ const ProductDetails = () => {
   };
 
   const userTierLevel = getTierLevel(profile?.tier || 'C');
-  const productTierLevel = getTierLevel(product.tier || 'B');
+  const productTierLevel = getTierLevel(product?.tier || 'B');
 
   // Tier A products are public - full access to everyone
   // Tier B products - full access to A and B users, limited to C users
   // Tier C products - full access to all authenticated users
   const hasFullAccess = 
-    product.tier === 'A' || // Tier A is public
+    product?.tier === 'A' || // Tier A is public
     userTierLevel >= productTierLevel || // User tier meets or exceeds product tier
-    (user && product.tier === 'C'); // Any authenticated user can access tier C
+    (user && product?.tier === 'C'); // Any authenticated user can access tier C
   
   const hasLimitedAccess = 
     !hasFullAccess && 
