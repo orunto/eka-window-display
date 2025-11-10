@@ -495,7 +495,7 @@ export const ProductsManager = () => {
                     <th className="px-4 py-3 text-left text-eka-pearl">Name</th>
                     <th className="px-4 py-3 text-left text-eka-pearl">Category</th>
                     <th className="px-4 py-3 text-left text-eka-pearl">Collection</th>
-                    <th className="px-4 py-3 text-left text-eka-pearl">Price</th>
+                    <th className="px-4 py-3 text-left text-eka-pearl">Price (NGN)</th>
                     <th className="px-4 py-3 text-left text-eka-pearl">Tier</th>
                     <th className="px-4 py-3 text-left text-eka-pearl">Status</th>
                     <th className="px-4 py-3 text-left text-eka-pearl">Actions</th>
@@ -507,7 +507,7 @@ export const ProductsManager = () => {
                       <td className="px-4 py-3 text-eka-pearl">{product.name}</td>
                       <td className="px-4 py-3 text-eka-champagne">{product.categories?.name || 'Uncategorized'}</td>
                       <td className="px-4 py-3 text-eka-champagne">{product.collections?.name || 'No collection'}</td>
-                      <td className="px-4 py-3 text-eka-champagne">${product.price || 'N/A'}</td>
+                      <td className="px-4 py-3 text-eka-champagne">₦{(product as any).price_ngn?.toLocaleString() || 'N/A'}</td>
                       <td className="px-4 py-3 text-eka-champagne">Tier {product.tier}</td>
                       <td className="px-4 py-3">
                         <div className="flex flex-col space-y-1">
@@ -578,8 +578,8 @@ export const ProductsManager = () => {
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-eka-champagne">Price:</span>
-                    <span className="text-eka-pearl">${product.price || 'N/A'}</span>
+                    <span className="text-eka-champagne">Price (NGN):</span>
+                    <span className="text-eka-pearl">₦{(product as any).price_ngn?.toLocaleString() || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-eka-champagne">Tier:</span>

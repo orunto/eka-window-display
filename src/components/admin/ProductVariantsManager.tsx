@@ -52,7 +52,7 @@ export const ProductVariantsManager = ({ productId }: ProductVariantsManagerProp
     }
   };
 
-  const handleAddVariant = async () => {
+  const handleAddVariant = () => {
     if (!newVariant.name || !newVariant.type) {
       toast({
         title: "Error",
@@ -62,31 +62,46 @@ export const ProductVariantsManager = ({ productId }: ProductVariantsManagerProp
       return;
     }
 
+    setPendingVariants([...pendingVariants, { ...newVariant }]);
+    setNewVariant({
+      name: "",
+      type: "",
+      price_adjustment: "0",
+      stock_quantity: "0",
+    });
+  };
+
+  const savePendingVariants = async () => {
+    if (pendingVariants.length === 0) {
+      toast({
+        title: "Error",
+        description: "No variants to save",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      const variantsToInsert = pendingVariants.map(v => ({
+        product_id: productId,
+        name: v.name,
+        type: v.type,
+        price_adjustment: parseFloat(v.price_adjustment),
+        stock_quantity: parseInt(v.stock_quantity),
+      }));
+
       const { error } = await supabase
         .from('product_variants')
-        .insert([{
-          product_id: productId,
-          name: newVariant.name,
-          type: newVariant.type,
-          price_adjustment: parseFloat(newVariant.price_adjustment),
-          stock_quantity: parseInt(newVariant.stock_quantity),
-        }]);
+        .insert(variantsToInsert);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Variant added successfully",
+        description: `${pendingVariants.length} variant(s) saved successfully`,
       });
 
-      setNewVariant({
-        name: "",
-        type: "",
-        price_adjustment: "0",
-        stock_quantity: "0",
-      });
-
+      setPendingVariants([]);
       fetchVariants();
     } catch (error: any) {
       toast({
@@ -95,6 +110,10 @@ export const ProductVariantsManager = ({ productId }: ProductVariantsManagerProp
         variant: "destructive",
       });
     }
+  };
+
+  const removePendingVariant = (index: number) => {
+    setPendingVariants(pendingVariants.filter((_, i) => i !== index));
   };
 
   const handleDeleteVariant = async (id: string) => {
@@ -129,41 +148,45 @@ export const ProductVariantsManager = ({ productId }: ProductVariantsManagerProp
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         <div>
+          <Label className="text-eka-champagne text-xs mb-1.5 block">Variant Type</Label>
           <Input
-            placeholder="Type (e.g., Size, Color)"
+            placeholder="e.g., Size, Color"
             value={newVariant.type}
             onChange={(e) => setNewVariant({ ...newVariant, type: e.target.value })}
             className="bg-eka-emerald-depth/20 border-eka-jade-luxury/30 text-eka-pearl"
           />
         </div>
         <div>
+          <Label className="text-eka-champagne text-xs mb-1.5 block">Variant Name</Label>
           <Input
-            placeholder="Name (e.g., Large, Red)"
+            placeholder="e.g., Large, Red"
             value={newVariant.name}
             onChange={(e) => setNewVariant({ ...newVariant, name: e.target.value })}
             className="bg-eka-emerald-depth/20 border-eka-jade-luxury/30 text-eka-pearl"
           />
         </div>
         <div>
+          <Label className="text-eka-champagne text-xs mb-1.5 block">Price Adjustment (%)</Label>
           <Input
             type="number"
             step="0.01"
-            placeholder="Price Adjustment"
+            placeholder="e.g., 10 or -5"
             value={newVariant.price_adjustment}
             onChange={(e) => setNewVariant({ ...newVariant, price_adjustment: e.target.value })}
             className="bg-eka-emerald-depth/20 border-eka-jade-luxury/30 text-eka-pearl"
           />
         </div>
         <div>
+          <Label className="text-eka-champagne text-xs mb-1.5 block">Stock Quantity</Label>
           <Input
             type="number"
-            placeholder="Stock"
+            placeholder="e.g., 50"
             value={newVariant.stock_quantity}
             onChange={(e) => setNewVariant({ ...newVariant, stock_quantity: e.target.value })}
             className="bg-eka-emerald-depth/20 border-eka-jade-luxury/30 text-eka-pearl"
           />
         </div>
-        <div>
+        <div className="flex items-end">
           <Button
             onClick={handleAddVariant}
             className="w-full bg-eka-golden hover:bg-eka-golden/80 text-eka-emerald-depth"
@@ -173,6 +196,46 @@ export const ProductVariantsManager = ({ productId }: ProductVariantsManagerProp
           </Button>
         </div>
       </div>
+
+      {pendingVariants.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label className="text-eka-champagne text-sm">Pending Variants ({pendingVariants.length})</Label>
+            <Button
+              onClick={savePendingVariants}
+              size="sm"
+              className="bg-eka-jade-luxury hover:bg-eka-jade-luxury/80 text-eka-pearl"
+            >
+              Save All Variants
+            </Button>
+          </div>
+          {pendingVariants.map((variant, index) => (
+            <div
+              key={index}
+              className="flex flex-wrap items-center justify-between gap-2 p-3 bg-eka-emerald-depth/10 rounded-lg border border-eka-golden/30"
+            >
+              <div className="flex flex-wrap gap-4 text-sm text-eka-pearl">
+                <span className="font-medium">{variant.type}:</span>
+                <span>{variant.name}</span>
+                {parseFloat(variant.price_adjustment) !== 0 && (
+                  <span className="text-eka-champagne">
+                    {parseFloat(variant.price_adjustment) > 0 ? '+' : ''}{variant.price_adjustment}%
+                  </span>
+                )}
+                <span className="text-eka-champagne">Stock: {variant.stock_quantity}</span>
+              </div>
+              <Button
+                onClick={() => removePendingVariant(index)}
+                size="sm"
+                variant="ghost"
+                className="text-red-400 hover:bg-red-500/20"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {variants.length > 0 && (
         <div className="space-y-2">
