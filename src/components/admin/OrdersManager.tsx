@@ -170,7 +170,7 @@ export const OrdersManager = () => {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-eka-golden font-semibold">
-                        ${order.total_amount.toFixed(2)}
+                        ₦{order.total_amount.toFixed(2)}
                       </td>
                       <td className="px-4 py-3">
                         <Select
@@ -233,7 +233,7 @@ export const OrdersManager = () => {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-eka-champagne">Total:</span>
-                    <span className="text-eka-golden font-semibold">${order.total_amount.toFixed(2)}</span>
+                    <span className="text-eka-golden font-semibold">₦{order.total_amount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-eka-champagne">Status:</span>
@@ -324,11 +324,11 @@ export const OrdersManager = () => {
                           <td className="px-4 py-3 text-eka-pearl">{item.product_name}</td>
                           <td className="px-4 py-3 text-eka-champagne">Tier {item.product_tier}</td>
                           <td className="px-4 py-3 text-right text-eka-champagne">
-                            ${item.unit_price.toFixed(2)}
+                            ₦{item.unit_price.toFixed(2)}
                           </td>
                           <td className="px-4 py-3 text-right text-eka-champagne">{item.quantity}</td>
                           <td className="px-4 py-3 text-right text-eka-golden font-semibold">
-                            ${item.subtotal.toFixed(2)}
+                            ₦{item.subtotal.toFixed(2)}
                           </td>
                         </tr>
                       ))}
@@ -339,7 +339,7 @@ export const OrdersManager = () => {
                   <div className="text-right">
                     <p className="text-eka-champagne">Total Amount</p>
                     <p className="text-3xl font-heading text-eka-golden">
-                      ${selectedOrder.total_amount.toFixed(2)}
+                      ₦{selectedOrder.total_amount.toFixed(2)}
                     </p>
                   </div>
                 </div>

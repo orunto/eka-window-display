@@ -119,8 +119,11 @@ export const UsersManager = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2">
         <h2 className="text-2xl font-heading text-eka-pearl">Users Management</h2>
+        <p className="text-sm text-eka-champagne">
+          Tier A = Luxe, Tier B = Premium, Tier C = Regular
+        </p>
       </div>
 
       {profiles.length === 0 ? (
@@ -172,9 +175,9 @@ export const UsersManager = () => {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="A">Tier A</SelectItem>
-                              <SelectItem value="B">Tier B</SelectItem>
-                              <SelectItem value="C">Tier C</SelectItem>
+                              <SelectItem value="A">Tier A (Luxe)</SelectItem>
+                              <SelectItem value="B">Tier B (Premium)</SelectItem>
+                              <SelectItem value="C">Tier C (Regular)</SelectItem>
                             </SelectContent>
                           </Select>
                         </td>
@@ -247,9 +250,9 @@ export const UsersManager = () => {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="A">Tier A</SelectItem>
-                            <SelectItem value="B">Tier B</SelectItem>
-                            <SelectItem value="C">Tier C</SelectItem>
+                            <SelectItem value="A">Tier A (Luxe)</SelectItem>
+                            <SelectItem value="B">Tier B (Premium)</SelectItem>
+                            <SelectItem value="C">Tier C (Regular)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

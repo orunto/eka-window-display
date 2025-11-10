@@ -21,6 +21,12 @@ declare global {
 interface CheckoutItem {
   product: any;
   quantity: number;
+  selectedVariant?: {
+    id: string;
+    name: string;
+    type: string;
+    price_adjustment: number;
+  };
 }
 
 export default function Checkout() {
@@ -112,8 +118,13 @@ export default function Checkout() {
 
   const calculateTotal = () => {
     return items.reduce((sum, item) => {
-      const price = getProductPrice(item.product, currency) || 0;
-      return sum + price * item.quantity;
+      const basePrice = getProductPrice(item.product, currency) || 0;
+      // Apply variant price adjustment if selected (percentage-based)
+      const variantMultiplier = item.selectedVariant 
+        ? 1 + (item.selectedVariant.price_adjustment / 100)
+        : 1;
+      const finalPrice = basePrice * variantMultiplier;
+      return sum + finalPrice * item.quantity;
     }, 0);
   };
 
@@ -250,11 +261,24 @@ export default function Checkout() {
             <CardContent>
               <div className="space-y-4">
                 {items.map((item, index) => {
-                  const price = getProductPrice(item.product, currency) || 0;
+                  const basePrice = getProductPrice(item.product, currency) || 0;
+                  const variantMultiplier = item.selectedVariant 
+                    ? 1 + (item.selectedVariant.price_adjustment / 100)
+                    : 1;
+                  const finalPrice = basePrice * variantMultiplier;
                   return (
-                    <div key={index} className="flex justify-between text-eka-champagne">
-                      <span>{item.product.name} x {item.quantity}</span>
-                      <span>{formatCurrency(price * item.quantity, currency)}</span>
+                    <div key={index} className="space-y-1">
+                      <div className="flex justify-between text-eka-champagne">
+                        <span>
+                          {item.product.name} x {item.quantity}
+                          {item.selectedVariant && (
+                            <span className="text-xs text-eka-champagne/70 block">
+                              {item.selectedVariant.type}: {item.selectedVariant.name}
+                            </span>
+                          )}
+                        </span>
+                        <span>{formatCurrency(finalPrice * item.quantity, currency)}</span>
+                      </div>
                     </div>
                   );
                 })}

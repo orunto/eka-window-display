@@ -32,17 +32,25 @@ const ProductDetails = () => {
   });
 
   // Determine access level based on user tier vs product tier
-  const getTierLevel = (tier: string | null): number => {
-    if (tier === 'A') return 3;
-    if (tier === 'B') return 2;
-    if (tier === 'C') return 1;
-    return 0;
+  const getTierLevel = (tier: string) => {
+    const tierMap: Record<string, number> = { 'A': 3, 'B': 2, 'C': 1 };
+    return tierMap[tier] || 0;
   };
 
-  const userTierLevel = getTierLevel(profile?.tier || null);
-  const productTierLevel = getTierLevel(product?.tier || null);
-  const hasFullAccess = userTierLevel >= productTierLevel;
-  const hasLimitedAccess = userTierLevel === productTierLevel - 1;
+  const userTierLevel = getTierLevel(profile?.tier || 'C');
+  const productTierLevel = getTierLevel(product.tier || 'B');
+
+  // Tier A products are public - full access to everyone
+  // Tier B products - full access to A and B users, limited to C users
+  // Tier C products - full access to all authenticated users
+  const hasFullAccess = 
+    product.tier === 'A' || // Tier A is public
+    userTierLevel >= productTierLevel || // User tier meets or exceeds product tier
+    (user && product.tier === 'C'); // Any authenticated user can access tier C
+  
+  const hasLimitedAccess = 
+    !hasFullAccess && 
+    userTierLevel === productTierLevel - 1; // One tier below
 
   useEffect(() => {
     // Scroll to top when component mounts
@@ -104,7 +112,24 @@ const ProductDetails = () => {
     if (!user) {
       setIsLoginOpen(true);
     } else {
-      navigate("/checkout", { state: { items: [{ product, quantity: 1 }] } });
+      const selectedVariantData = selectedVariant 
+        ? variants.find(v => v.id === selectedVariant)
+        : undefined;
+      
+      navigate("/checkout", { 
+        state: { 
+          items: [{ 
+            product, 
+            quantity: 1,
+            selectedVariant: selectedVariantData ? {
+              id: selectedVariantData.id,
+              name: selectedVariantData.name,
+              type: selectedVariantData.type,
+              price_adjustment: selectedVariantData.price_adjustment
+            } : undefined
+          }] 
+        } 
+      });
     }
   };
 
