@@ -140,21 +140,53 @@ export default function Checkout() {
     const total = calculateTotal();
 
     try {
-      // Create order in database
+      // Create order in database with currency
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
           user_id: user.id,
           total_amount: total,
-          status: "pending",
+          status: "initiated",
           customer_email: email,
           customer_name: name,
           shipping_address: address,
+          currency: currency,
         })
         .select()
         .single();
 
       if (orderError) throw orderError;
+
+      // Insert order items
+      const orderItemsData = items.map(item => {
+        const basePrice = getProductPrice(item.product, currency) || 0;
+        const variantMultiplier = item.selectedVariant 
+          ? 1 + (item.selectedVariant.price_adjustment / 100)
+          : 1;
+        const unitPrice = basePrice * variantMultiplier;
+        
+        return {
+          order_id: order.id,
+          product_id: item.product.id,
+          product_name: item.product.name,
+          product_tier: item.product.tier,
+          quantity: item.quantity,
+          unit_price: unitPrice,
+          subtotal: unitPrice * item.quantity,
+          variant_id: item.selectedVariant?.id || null,
+          variant_name: item.selectedVariant?.name || null,
+          variant_type: item.selectedVariant?.type || null,
+        };
+      });
+
+      const { error: itemsError } = await supabase
+        .from("order_items")
+        .insert(orderItemsData);
+
+      if (itemsError) {
+        console.error("Error inserting order items:", itemsError);
+        throw itemsError;
+      }
 
       // Determine payment provider and key based on currency
       const usePaystack = currency === "NGN";
@@ -188,18 +220,41 @@ export default function Checkout() {
             ],
           },
           callback: async (response: any) => {
-            // Update order status
-            await supabase
-              .from("orders")
-              .update({ status: "completed" })
-              .eq("id", order.id);
+            console.log('Payment callback:', response);
+            
+            // Verify payment with backend
+            try {
+              const { data: verifyData, error: verifyError } = await supabase.functions.invoke(
+                'verify-paystack-payment',
+                {
+                  body: {
+                    reference: response.reference,
+                    orderId: order.id,
+                  },
+                }
+              );
 
-            toast({
-              title: "Payment Successful",
-              description: "Your order has been placed successfully!",
-            });
+              if (verifyError) {
+                console.error('Payment verification error:', verifyError);
+                throw verifyError;
+              }
 
-            navigate("/orders");
+              console.log('Payment verified:', verifyData);
+
+              toast({
+                title: "Payment Successful",
+                description: "Your order has been placed successfully!",
+              });
+
+              navigate("/orders");
+            } catch (error) {
+              console.error('Error verifying payment:', error);
+              toast({
+                title: "Payment Verification Failed",
+                description: "Please contact support with your order reference.",
+                variant: "destructive",
+              });
+            }
           },
           onClose: () => {
             toast({

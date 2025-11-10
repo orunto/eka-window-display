@@ -108,8 +108,10 @@ export const OrdersManager = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending':
-        return 'bg-yellow-500/20 text-yellow-400';
+      case 'initiated':
+        return 'bg-gray-500/20 text-gray-400';
+      case 'paid':
+        return 'bg-emerald-500/20 text-emerald-400';
       case 'processing':
         return 'bg-blue-500/20 text-blue-400';
       case 'shipped':
@@ -181,7 +183,8 @@ export const OrdersManager = () => {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="initiated">Initiated</SelectItem>
+                            <SelectItem value="paid">Paid</SelectItem>
                             <SelectItem value="processing">Processing</SelectItem>
                             <SelectItem value="shipped">Shipped</SelectItem>
                             <SelectItem value="delivered">Delivered</SelectItem>
@@ -244,13 +247,14 @@ export const OrdersManager = () => {
                       <SelectTrigger className={`w-32 bg-eka-emerald-depth/20 border-eka-jade-luxury/30 ${getStatusColor(order.status)}`}>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="processing">Processing</SelectItem>
-                        <SelectItem value="shipped">Shipped</SelectItem>
-                        <SelectItem value="delivered">Delivered</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                      </SelectContent>
+                        <SelectContent>
+                          <SelectItem value="initiated">Initiated</SelectItem>
+                          <SelectItem value="paid">Paid</SelectItem>
+                          <SelectItem value="processing">Processing</SelectItem>
+                          <SelectItem value="shipped">Shipped</SelectItem>
+                          <SelectItem value="delivered">Delivered</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                        </SelectContent>
                     </Select>
                   </div>
                   <div className="flex justify-between">

@@ -127,6 +127,9 @@ export type Database = {
           quantity: number
           subtotal: number
           unit_price: number
+          variant_id: string | null
+          variant_name: string | null
+          variant_type: string | null
         }
         Insert: {
           created_at?: string | null
@@ -138,6 +141,9 @@ export type Database = {
           quantity?: number
           subtotal: number
           unit_price: number
+          variant_id?: string | null
+          variant_name?: string | null
+          variant_type?: string | null
         }
         Update: {
           created_at?: string | null
@@ -149,6 +155,9 @@ export type Database = {
           quantity?: number
           subtotal?: number
           unit_price?: number
+          variant_id?: string | null
+          variant_name?: string | null
+          variant_type?: string | null
         }
         Relationships: [
           {
@@ -170,6 +179,7 @@ export type Database = {
       orders: {
         Row: {
           created_at: string | null
+          currency: string | null
           customer_email: string | null
           customer_name: string | null
           id: string
@@ -182,6 +192,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          currency?: string | null
           customer_email?: string | null
           customer_name?: string | null
           id?: string
@@ -194,6 +205,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          currency?: string | null
           customer_email?: string | null
           customer_name?: string | null
           id?: string
