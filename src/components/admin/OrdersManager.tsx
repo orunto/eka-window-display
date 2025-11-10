@@ -265,7 +265,7 @@ export const OrdersManager = () => {
       )}
 
       <Dialog open={isViewingOrder} onOpenChange={setIsViewingOrder}>
-        <DialogContent className="max-w-3xl bg-eka-emerald-depth border-eka-jade-luxury/30">
+        <DialogContent className="max-w-[95vw] sm:max-w-3xl bg-eka-emerald-depth border-eka-jade-luxury/30 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-heading text-eka-pearl">
               Order Details
@@ -273,7 +273,7 @@ export const OrdersManager = () => {
           </DialogHeader>
           
           {selectedOrder && (
-            <div className="space-y-6">
+            <div className="space-y-6 pb-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-eka-champagne">Order ID</label>

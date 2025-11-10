@@ -44,18 +44,22 @@ export function AdminSidebar({
   const {
     open
   } = useSidebar();
-  return <Sidebar className="border-eka-jade-luxury/30">
-      <SidebarContent className="bg-eka-emerald-depth/40 backdrop-blur-xl">
+  return <Sidebar className="border-eka-jade-luxury/30 bg-eka-emerald-depth/95 backdrop-blur-xl">
+      <SidebarContent className="bg-transparent">
         <SidebarGroup className="mx-0 py-[75px] px-[5px]">
-          <SidebarGroupLabel className="text-eka-champagne">
+          <SidebarGroupLabel className="text-eka-champagne font-semibold text-sm">
             Admin Panel
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map(item => <SidebarMenuItem key={item.value}>
-                  <SidebarMenuButton onClick={() => onViewChange(item.value)} isActive={activeView === item.value} className="text-eka-pearl hover:bg-eka-jade-luxury/20 data-[active=true]:bg-eka-golden data-[active=true]:text-eka-emerald-depth">
-                    <item.icon className="h-4 w-4" />
-                    {open && <span>{item.title}</span>}
+                  <SidebarMenuButton 
+                    onClick={() => onViewChange(item.value)} 
+                    isActive={activeView === item.value} 
+                    className="text-eka-pearl hover:bg-eka-jade-luxury/20 data-[active=true]:bg-eka-golden data-[active=true]:text-eka-emerald-depth font-medium"
+                  >
+                    <item.icon className="h-4 w-4 flex-shrink-0" />
+                    {open && <span className="ml-2">{item.title}</span>}
                   </SidebarMenuButton>
                 </SidebarMenuItem>)}
             </SidebarMenu>

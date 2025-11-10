@@ -182,13 +182,13 @@ export const CategoriesManager = () => {
               Add Category
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-eka-emerald-depth border-eka-jade-luxury/30 text-eka-pearl">
+          <DialogContent className="bg-eka-emerald-depth border-eka-jade-luxury/30 text-eka-pearl max-h-[90vh] overflow-y-auto max-w-[95vw] sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle className="text-eka-pearl">
                 {editingCategory ? 'Edit Category' : 'Add New Category'}
               </DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 pb-4">
               <div>
                 <Label htmlFor="name">Name *</Label>
                 <Input

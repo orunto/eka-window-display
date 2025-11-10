@@ -86,8 +86,8 @@ export const AdminDashboard = () => {
             </Button>
           </header>
 
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">
-            <div className="bg-gradient-glass backdrop-blur-xl rounded-3xl border border-eka-jade-luxury/30 p-4 sm:p-6 lg:p-8">
+          <main className="flex-1 p-2 sm:p-6 lg:p-8 overflow-x-hidden">
+            <div className="bg-gradient-glass backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-eka-jade-luxury/30 p-3 sm:p-6 lg:p-8">
               {renderContent()}
             </div>
           </main>
