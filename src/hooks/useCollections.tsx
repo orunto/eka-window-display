@@ -10,6 +10,7 @@ export interface Collection {
   created_at: string | null;
   tier?: string;
   season?: string;
+  features?: string[];
 }
 
 export const useCollections = (filters?: { featured?: boolean }) => {
@@ -45,13 +46,13 @@ export const useCollections = (filters?: { featured?: boolean }) => {
   return { collections, loading, error };
 };
 
-export const useCollection = (id: string | undefined) => {
+export const useCollection = (slug: string | undefined) => {
   const [collection, setCollection] = useState<Collection | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!id) {
+    if (!slug) {
       setLoading(false);
       return;
     }
@@ -59,11 +60,32 @@ export const useCollection = (id: string | undefined) => {
     const fetchCollection = async () => {
       try {
         setLoading(true);
-        const { data, error: fetchError } = await supabase
+        
+        // Try to fetch by ID first (for backward compatibility)
+        let query = supabase
           .from('collections')
           .select('*')
-          .eq('id', id)
-          .single();
+          .eq('id', slug)
+          .maybeSingle();
+
+        let { data, error: fetchError } = await query;
+
+        // If not found by ID, try by name (slug)
+        if (!data && !fetchError) {
+          const nameQuery = slug
+            .split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+          
+          const { data: nameData, error: nameError } = await supabase
+            .from('collections')
+            .select('*')
+            .ilike('name', nameQuery)
+            .maybeSingle();
+          
+          data = nameData;
+          fetchError = nameError;
+        }
 
         if (fetchError) throw fetchError;
         setCollection(data);
@@ -76,7 +98,7 @@ export const useCollection = (id: string | undefined) => {
     };
 
     fetchCollection();
-  }, [id]);
+  }, [slug]);
 
   return { collection, loading, error };
 };

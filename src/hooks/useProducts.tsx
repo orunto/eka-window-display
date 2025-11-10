@@ -69,13 +69,13 @@ export const useProducts = (filters?: {
   return { products, loading, error };
 };
 
-export const useProduct = (id: string | undefined) => {
+export const useProduct = (slug: string | undefined) => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!id) {
+    if (!slug) {
       setLoading(false);
       return;
     }
@@ -83,11 +83,32 @@ export const useProduct = (id: string | undefined) => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const { data, error: fetchError } = await supabase
+        
+        // Try to fetch by ID first (for backward compatibility)
+        let query = supabase
           .from('products')
           .select('*')
-          .eq('id', id)
-          .single();
+          .eq('id', slug)
+          .maybeSingle();
+
+        let { data, error: fetchError } = await query;
+
+        // If not found by ID, try by name (slug)
+        if (!data && !fetchError) {
+          const nameQuery = slug
+            .split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+          
+          const { data: nameData, error: nameError } = await supabase
+            .from('products')
+            .select('*')
+            .ilike('name', nameQuery)
+            .maybeSingle();
+          
+          data = nameData;
+          fetchError = nameError;
+        }
 
         if (fetchError) throw fetchError;
         setProduct(data);
@@ -100,7 +121,7 @@ export const useProduct = (id: string | undefined) => {
     };
 
     fetchProduct();
-  }, [id]);
+  }, [slug]);
 
   return { product, loading, error };
 };

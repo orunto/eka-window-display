@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Eye, Lock, ArrowRight } from "lucide-react";
 import { LoginModal } from "./LoginModal";
+import { useNavigate } from "react-router-dom";
+import { slugify } from "@/utils/slugify";
 
 type CollectionTier = "A" | "B" | "C";
 
@@ -22,6 +24,7 @@ interface CollectionCardProps {
 }
 
 export const CollectionCard = ({ collection, onClick }: CollectionCardProps) => {
+  const navigate = useNavigate();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -30,7 +33,11 @@ export const CollectionCard = ({ collection, onClick }: CollectionCardProps) => 
       setIsLoginOpen(true);
       return;
     }
-    onClick?.();
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(`/collection/${slugify(collection.name)}`);
+    }
   };
 
   const getTierInfo = () => {

@@ -7,15 +7,21 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LoginModal } from "@/components/LoginModal";
 import { ArrowLeft, Lock, ShoppingBag, Heart, X } from "lucide-react";
-import { mockProducts } from "@/data/mockData";
+import { useProduct, useProducts } from "@/hooks/useProducts";
+import { slugify } from "@/utils/slugify";
 
 const ProductDetails = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageViewOpen, setIsImageViewOpen] = useState(false);
   const [showPriceInfo, setShowPriceInfo] = useState(false);
+
+  const { product, loading } = useProduct(slug);
+  const { products: relatedProducts } = useProducts({
+    collectionId: product?.collection_id || undefined,
+  });
 
   useEffect(() => {
     // Scroll to top when component mounts
@@ -36,24 +42,37 @@ const ProductDetails = () => {
     loadFonts();
   }, []);
 
-  const product = mockProducts.find(p => p.id === id);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <EkaHeader />
+        <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28">
+          <p className="text-eka-pearl">Loading...</p>
+        </div>
+      </div>
+    );
+  }
   
   if (!product) {
     return (
       <div className="min-h-screen bg-background">
         <EkaHeader />
         <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28">
-          <p>Product not found</p>
+          <p className="text-eka-pearl">Product not found</p>
         </div>
       </div>
     );
   }
 
-  // Mock multiple images for carousel
-  const productImages = [product.image, product.image, product.image];
+  // Use gallery images or fallback to main image
+  const productImages = product.gallery_images && product.gallery_images.length > 0
+    ? product.gallery_images
+    : product.image_url
+    ? [product.image_url]
+    : [];
   
-  const relatedProducts = mockProducts
-    .filter(p => p.collection === product.collection && p.id !== product.id)
+  const filteredRelatedProducts = relatedProducts
+    .filter(p => p.id !== product.id)
     .slice(0, 4);
 
   const handlePurchaseClick = () => {
@@ -118,28 +137,30 @@ const ProductDetails = () => {
             </div>
             
             {/* Image Thumbnails */}
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
-              {productImages.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setCurrentImageIndex(index);
-                    openImageView(index);
-                  }}
-                  className={`flex-shrink-0 aspect-square w-16 sm:w-20 rounded-md overflow-hidden border-2 transition-all duration-300 touch-manipulation ${
-                    currentImageIndex === index 
-                      ? 'border-eka-golden shadow-glow' 
-                      : 'border-transparent hover:border-eka-jade-luxury'
-                  }`}
-                >
-                  <img 
-                    src={image} 
-                    alt={`${product.name} ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
+            {productImages.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
+                {productImages.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setCurrentImageIndex(index);
+                      openImageView(index);
+                    }}
+                    className={`flex-shrink-0 aspect-square w-16 sm:w-20 rounded-md overflow-hidden border-2 transition-all duration-300 touch-manipulation ${
+                      currentImageIndex === index 
+                        ? 'border-eka-golden shadow-glow' 
+                        : 'border-transparent hover:border-eka-jade-luxury'
+                    }`}
+                  >
+                    <img 
+                      src={image} 
+                      alt={`${product.name} ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Information */}
@@ -152,14 +173,8 @@ const ProductDetails = () => {
                 {getTierBadge()}
               </div>
               
-              {product.collection && (
-                <p className="text-base sm:text-lg text-eka-golden font-medium">
-                  {product.collection} Collection
-                </p>
-              )}
-              
               <p className="text-xs sm:text-sm text-eka-champagne uppercase tracking-wider">
-                {product.category}
+                Product
               </p>
             </div>
 
@@ -229,17 +244,25 @@ const ProductDetails = () => {
         </div>
 
         {/* Related Products */}
-        {relatedProducts.length > 0 && (
+        {filteredRelatedProducts.length > 0 && (
           <div className="mt-12 sm:mt-16 lg:mt-20">
             <h2 className="text-xl sm:text-2xl font-heading font-normal text-eka-pearl mb-6 sm:mb-8">
-              More from {product.collection} Collection
+              Related Products
             </h2>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {relatedProducts.map((relatedProduct) => (
+              {filteredRelatedProducts.map((relatedProduct) => (
                 <ProductCard 
                   key={relatedProduct.id} 
-                  product={relatedProduct}
+                  product={{
+                    id: relatedProduct.id,
+                    name: relatedProduct.name,
+                    image: relatedProduct.image_url || '/placeholder.svg',
+                    price: relatedProduct.price || undefined,
+                    category: 'Product',
+                    tier: (relatedProduct.tier as "A" | "B" | "C") || "A",
+                    description: relatedProduct.description || '',
+                  }}
                 />
               ))}
             </div>

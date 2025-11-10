@@ -6,6 +6,7 @@ import { Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { slugify } from "@/utils/slugify";
 
 const Collections = () => {
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ const Collections = () => {
 
               <section 
                 className="group cursor-pointer transition-all duration-700 hover:scale-[1.02] relative"
-                onClick={() => navigate(`/collection/${collection.id}`)}
+                onClick={() => navigate(`/collection/${slugify(collection.name)}`)}
               >
                 {/* Background glow effect */}
                 <div className="absolute inset-0 bg-gradient-accent opacity-0 group-hover:opacity-5 blur-3xl transition-opacity duration-700 rounded-3xl" />

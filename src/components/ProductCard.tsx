@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { slugify } from "@/utils/slugify";
 
 interface Product {
   id: string;
@@ -29,7 +30,7 @@ export const ProductCard = ({ product, onClick }: ProductCardProps) => {
     if (onClick) {
       onClick();
     }
-    navigate(`/product/${product.id}`);
+    navigate(`/product/${slugify(product.name)}`);
   };
 
   const getTierBadge = () => {

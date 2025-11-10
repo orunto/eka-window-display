@@ -5,11 +5,20 @@ import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
-import { mockProducts, mockCollections } from "@/data/mockData";
+import { useCollection } from "@/hooks/useCollections";
+import { useProducts } from "@/hooks/useProducts";
+import { useAuth } from "@/contexts/AuthContext";
+import { slugify } from "@/utils/slugify";
 
 const CollectionDetails = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const { collection, loading: collectionLoading } = useCollection(slug);
+  const { products, loading: productsLoading } = useProducts({
+    collectionId: collection?.id,
+  });
 
   useEffect(() => {
     // Load fonts
@@ -27,8 +36,17 @@ const CollectionDetails = () => {
     loadFonts();
   }, []);
 
-  const collection = mockCollections.find(c => c.id === id);
-  
+  if (collectionLoading || productsLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <EkaHeader />
+        <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!collection) {
     return (
       <div className="min-h-screen bg-background">
@@ -40,7 +58,8 @@ const CollectionDetails = () => {
     );
   }
 
-  const collectionProducts = mockProducts.filter(p => p.collection === collection.name);
+  // Filter products based on user tier
+  const collectionProducts = user ? products : products.filter(p => p.tier === 'A');
 
   const getTierBadge = () => {
     switch (collection.tier) {
@@ -112,17 +131,25 @@ const CollectionDetails = () => {
                   Collection Highlights
                 </h3>
                 <ul className="space-y-2 text-muted-foreground">
-                  <li>• {collection.productCount} exclusive pieces</li>
-                  <li>• Handcrafted with sustainable luxury materials</li>
-                  <li>• Limited production run</li>
-                  <li>• Custom sizing available for select pieces</li>
+                  {collection.features && collection.features.length > 0 ? (
+                    collection.features.map((feature, index) => (
+                      <li key={index}>• {feature}</li>
+                    ))
+                  ) : (
+                    <>
+                      <li>• Exclusive luxury pieces</li>
+                      <li>• Handcrafted with premium materials</li>
+                      <li>• Limited production</li>
+                      <li>• Custom sizing available</li>
+                    </>
+                  )}
                 </ul>
               </div>
             </div>
 
             <div className="aspect-[4/3] rounded-lg overflow-hidden">
               <img 
-                src={collection.image} 
+                src={collection.image_url || '/placeholder.svg'} 
                 alt={collection.name}
                 className="w-full h-full object-cover"
               />
@@ -146,7 +173,15 @@ const CollectionDetails = () => {
             {collectionProducts.map((product) => (
               <ProductCard 
                 key={product.id} 
-                product={product}
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  image: product.image_url || '/placeholder.svg',
+                  price: product.price || undefined,
+                  category: 'Product',
+                  tier: (product.tier as "A" | "B" | "C") || "A",
+                  description: product.description || '',
+                }}
               />
             ))}
           </div>
