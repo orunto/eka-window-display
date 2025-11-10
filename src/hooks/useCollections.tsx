@@ -60,18 +60,26 @@ export const useCollection = (slug: string | undefined) => {
     const fetchCollection = async () => {
       try {
         setLoading(true);
+        let data = null;
+        let fetchError = null;
         
-        // Try to fetch by ID first (for backward compatibility)
-        let query = supabase
-          .from('collections')
-          .select('*')
-          .eq('id', slug)
-          .maybeSingle();
-
-        let { data, error: fetchError } = await query;
-
-        // If not found by ID, try by name (slug)
-        if (!data && !fetchError) {
+        // Check if slug looks like a UUID (for backward compatibility)
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+        
+        if (isUUID) {
+          // Try to fetch by ID
+          const result = await supabase
+            .from('collections')
+            .select('*')
+            .eq('id', slug)
+            .maybeSingle();
+          
+          data = result.data;
+          fetchError = result.error;
+        }
+        
+        // If not found by ID or slug is not a UUID, try by name
+        if (!data) {
           const nameQuery = slug
             .split('-')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
