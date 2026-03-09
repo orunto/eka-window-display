@@ -1,7 +1,1 @@
-project_id = "knypbtvagnjaqtptfinn"
-
-[functions.register-user]
-verify_jwt = false
-
-[functions.verify-paystack-payment]
-verify_jwt = false
+project_id = "xdmuayuzrveuozibgnej"
