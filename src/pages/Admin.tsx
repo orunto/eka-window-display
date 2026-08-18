@@ -113,11 +113,16 @@ const Admin = () => {
     );
   }
 
+  const showPublicChrome = !user || !isAdmin;
+
   return (
     <div className="min-h-screen bg-gradient-hero relative overflow-hidden">
-      <EkaHeader />
+      {showPublicChrome && <EkaHeader />}
       
-      <div className="container mx-auto px-4 py-20 pt-24 sm:pt-28 relative z-10">
+      <div className={showPublicChrome
+        ? "container mx-auto px-4 py-20 pt-24 sm:pt-28 relative z-10"
+        : "relative z-10"
+      }>
         {!user ? (
           <AdminAuth />
         ) : !isAdmin ? (
@@ -132,7 +137,7 @@ const Admin = () => {
         )}
       </div>
 
-      <EkaFooter />
+      {showPublicChrome && <EkaFooter />}
     </div>
   );
 };
