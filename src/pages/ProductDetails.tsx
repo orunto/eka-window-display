@@ -152,7 +152,7 @@ const ProductDetails = () => {
     <div 
       className="min-h-screen relative overflow-hidden"
       style={{
-        backgroundImage: `url(/lovable-uploads/a8277916-da04-404a-a49d-3a6e73a0433f.png)`,
+        backgroundImage: `url(/assets/a8277916-da04-404a-a49d-3a6e73a0433f.png)`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'

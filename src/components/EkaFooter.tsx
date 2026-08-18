@@ -59,7 +59,7 @@ export const EkaFooter = () => {
             <div className="space-y-6">
               <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 bg-gradient-accent rounded-2xl flex items-center justify-center shadow-glow">
-                  <img src="/lovable-uploads/0555df50-cd91-4e2c-95d7-7009f8e63ef9.png" alt="Eka" className="w-10 h-10 object-contain" />
+                  <img src="/assets/0555df50-cd91-4e2c-95d7-7009f8e63ef9.png" alt="Eka" className="w-10 h-10 object-contain" />
                 </div>
                 <h3 className="text-5xl font-heading tracking-wider text-eka-golden">EKA</h3>
               </div>

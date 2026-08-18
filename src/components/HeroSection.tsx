@@ -14,7 +14,7 @@ export const HeroSection = () => {
         <div 
           className="absolute inset-0 opacity-20"
           style={{
-            backgroundImage: `url(/lovable-uploads/faba6ba3-5bb9-4134-9891-08c5c6bad58a.png)`,
+            backgroundImage: `url(/assets/faba6ba3-5bb9-4134-9891-08c5c6bad58a.png)`,
             backgroundSize: '120px 120px',
             backgroundRepeat: 'repeat'
           }}
@@ -26,7 +26,7 @@ export const HeroSection = () => {
           <div className="animate-fade-in">
             <div className="w-24 h-24 bg-white/10 backdrop-blur-sm rounded-full mx-auto mb-8 flex items-center justify-center border border-white/20">
               <img 
-                src="/lovable-uploads/0555df50-cd91-4e2c-95d7-7009f8e63ef9.png" 
+                src="/assets/0555df50-cd91-4e2c-95d7-7009f8e63ef9.png" 
                 alt="Eka" 
                 className="w-16 h-16 object-contain"
               />
